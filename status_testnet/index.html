@@ -393,6 +393,101 @@
             color: #999;
         }
 
+        /* History table */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        .history-table th {
+            text-align: left;
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+            padding: 10px 12px;
+            border-bottom: 1px solid #222;
+        }
+
+        .history-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #151515;
+            font-size: 0.9em;
+        }
+
+        .history-table tr:hover td {
+            background: #151515;
+        }
+
+        .history-table .txid-cell {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.82em;
+            word-break: break-all;
+        }
+
+        .history-table .txid-cell a {
+            color: #ccc;
+            transition: color 0.2s;
+        }
+
+        .history-table .txid-cell a:hover {
+            color: #ff9900;
+        }
+
+        .history-table .time-cell {
+            white-space: nowrap;
+            color: #888;
+        }
+
+        .history-count {
+            font-size: 0.85em;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .page-btn {
+            padding: 6px 14px;
+            border-radius: 4px;
+            border: 1px solid #222;
+            background: #111;
+            color: #999;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: #ff9900;
+            color: #ff9900;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.3;
+            cursor: default;
+        }
+
+        .page-btn.active {
+            background: rgba(255, 153, 0, 0.12);
+            border-color: #ff9900;
+            color: #ff9900;
+        }
+
+        .page-info {
+            font-size: 0.85em;
+            color: #666;
+        }
+
         footer {
             border-top: 1px solid #151515;
             padding: 30px 24px;
@@ -509,6 +604,14 @@
     <div id="rounds-container">
         <div class="no-rounds">Loading round data...</div>
     </div>
+
+    <!-- Coinjoin History -->
+    <h2 class="section-title" style="margin-top:40px">Coinjoin History</h2>
+    <div id="history-count" class="history-count"></div>
+    <div id="history-container">
+        <div class="no-rounds">Loading history...</div>
+    </div>
+    <div id="pagination" class="pagination"></div>
 
     <div class="info-box">
         <strong>Live updates:</strong> Data is fetched from the coordinator every 10 seconds.
@@ -688,6 +791,90 @@
     fetchStatus();
     setInterval(fetchStatus, FETCH_INTERVAL);
     setInterval(render, TICK_INTERVAL);
+
+    // --- Coinjoin History ---
+    var HISTORY_URL = 'https://testnet.coinjoiner.com/wabisabi/coinjoin-history';
+    var MEMPOOL_BASE = 'https://mempool.space/testnet4/tx/';
+    var PER_PAGE = 100;
+    var historyData = [];
+    var currentPage = 1;
+
+    function renderHistory() {
+        var container = document.getElementById('history-container');
+        var countEl = document.getElementById('history-count');
+        var pagEl = document.getElementById('pagination');
+
+        if (historyData.length === 0) {
+            container.innerHTML = '<div class="no-rounds">No coinjoin history yet.</div>';
+            countEl.textContent = '';
+            pagEl.innerHTML = '';
+            return;
+        }
+
+        // Reverse so newest first
+        var sorted = historyData.slice().reverse();
+        var totalPages = Math.ceil(sorted.length / PER_PAGE);
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        var start = (currentPage - 1) * PER_PAGE;
+        var pageItems = sorted.slice(start, start + PER_PAGE);
+
+        countEl.textContent = 'Total successful coinjoins: ' + sorted.length;
+
+        var html = '<table class="history-table">';
+        html += '<thead><tr><th>#</th><th>Transaction ID</th><th>Time</th></tr></thead>';
+        html += '<tbody>';
+        pageItems.forEach(function(entry, i) {
+            var num = sorted.length - start - i;
+            html += '<tr>';
+            html += '<td>' + num + '</td>';
+            html += '<td class="txid-cell"><a href="' + MEMPOOL_BASE + entry.txid + '" target="_blank" rel="noopener">' + entry.txid + '</a></td>';
+            html += '<td class="time-cell">' + entry.timestamp + '</td>';
+            html += '</tr>';
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+
+        // Pagination
+        var pagHtml = '';
+        pagHtml += '<button class="page-btn" onclick="goToPage(1)" ' + (currentPage === 1 ? 'disabled' : '') + '>&laquo;</button>';
+        pagHtml += '<button class="page-btn" onclick="goToPage(' + (currentPage - 1) + ')" ' + (currentPage === 1 ? 'disabled' : '') + '>&lsaquo;</button>';
+
+        // Show page numbers around current page
+        var startPage = Math.max(1, currentPage - 2);
+        var endPage = Math.min(totalPages, currentPage + 2);
+        for (var p = startPage; p <= endPage; p++) {
+            pagHtml += '<button class="page-btn' + (p === currentPage ? ' active' : '') + '" onclick="goToPage(' + p + ')">' + p + '</button>';
+        }
+
+        pagHtml += '<button class="page-btn" onclick="goToPage(' + (currentPage + 1) + ')" ' + (currentPage === totalPages ? 'disabled' : '') + '>&rsaquo;</button>';
+        pagHtml += '<button class="page-btn" onclick="goToPage(' + totalPages + ')" ' + (currentPage === totalPages ? 'disabled' : '') + '>&raquo;</button>';
+        pagHtml += '<span class="page-info">Page ' + currentPage + ' of ' + totalPages + '</span>';
+        pagEl.innerHTML = pagHtml;
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        renderHistory();
+        document.querySelector('.section-title[style]').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function fetchHistory() {
+        fetch(HISTORY_URL)
+            .then(function(res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .then(function(data) {
+                historyData = Array.isArray(data) ? data : [];
+                renderHistory();
+            })
+            .catch(function() {
+                document.getElementById('history-container').innerHTML = '<div class="no-rounds">Could not load coinjoin history.</div>';
+            });
+    }
+
+    fetchHistory();
 </script>
 
 </body>
