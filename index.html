@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coinjoiner - WabiSabi Coordinator for Bitcoin Privacy</title>
+    <meta name="description" content="Coinjoiner is a 0% fee WabiSabi coordinator for Wasabi Wallet, improving Bitcoin privacy through decentralized coinjoins.">
+    <meta property="og:title" content="Coinjoiner - WabiSabi Coordinator">
+    <meta property="og:description" content="0% fee WabiSabi coordinator improving Bitcoin privacy.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://coinjoiner.com">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            background: #0a0a0a;
+            color: #d0d0d0;
+        }
+
+        a {
+            color: #ff9900;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #1a1a1a;
+            z-index: 100;
+        }
+
+        .nav-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #ff9900;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #999;
+            font-size: 0.9em;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #ff9900;
+            text-decoration: none;
+        }
+
+        /* Sections */
+        .section {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+
+        .section + .section {
+            border-top: 1px solid #151515;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 80px 24px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.8em;
+            color: #ff9900;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .hero .subtitle {
+            font-size: 1.2em;
+            color: #888;
+            max-width: 550px;
+            margin: 0 auto 36px;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            background: #ff9900;
+            color: #0a0a0a;
+            padding: 12px 32px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1em;
+            transition: background 0.2s;
+        }
+
+        .hero-cta:hover {
+            background: #e68a00;
+            text-decoration: none;
+        }
+
+        /* Headings */
+        h2 {
+            color: #ff9900;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            color: #e0e0e0;
+            font-size: 1.15em;
+            margin-top: 28px;
+            margin-bottom: 8px;
+        }
+
+        p + p {
+            margin-top: 14px;
+        }
+
+        ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Connect box */
+        .connect-box {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 10px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+
+        .connect-box p {
+            margin-bottom: 12px;
+            color: #aaa;
+            font-size: 0.95em;
+        }
+
+        .copy-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .copy-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .copy-group label {
+            display: block;
+            font-size: 0.85em;
+            color: #777;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .copy-field {
+            display: flex;
+            gap: 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #2a2a2a;
+        }
+
+        .copy-field code {
+            flex: 1;
+            padding: 12px 14px;
+            background: #0d0d0d;
+            color: #ccc;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .copy-btn {
+            padding: 12px 18px;
+            background: #1a1a1a;
+            color: #ff9900;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: background 0.2s;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+
+        .copy-btn:hover {
+            background: #222;
+        }
+
+        .copy-btn.copied {
+            color: #4caf50;
+        }
+
+        /* Blockquote */
+        blockquote {
+            background: #111;
+            border-left: 3px solid #ff9900;
+            padding: 16px 20px;
+            margin: 16px 0;
+            border-radius: 0 6px 6px 0;
+            color: #aaa;
+            font-size: 0.92em;
+        }
+
+        /* Goals list */
+        .goals-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .goals-list li {
+            padding: 14px 0;
+            border-bottom: 1px solid #151515;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .goals-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 22px;
+            width: 8px;
+            height: 8px;
+            background: #ff9900;
+            border-radius: 50%;
+        }
+
+        .goals-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Refs */
+        .ref {
+            font-size: 0.85em;
+            color: #666;
+            vertical-align: super;
+        }
+
+        .references {
+            margin-top: 30px;
+            font-size: 0.85em;
+            color: #555;
+        }
+
+        .references a {
+            color: #777;
+            word-break: break-all;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid #151515;
+            padding: 30px 24px;
+            text-align: center;
+        }
+
+        .footer-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-text {
+            color: #555;
+            font-size: 0.85em;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .footer-links a {
+            color: #666;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9em;
+        }
+
+        .footer-links a:hover {
+            color: #ff9900;
+            text-decoration: none;
+        }
+
+        .footer-links svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .hero h1 {
+                font-size: 2em;
+            }
+
+            .hero .subtitle {
+                font-size: 1.05em;
+            }
+
+            .nav-links {
+                gap: 16px;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-inner">
+        <span class="nav-brand">Coinjoiner</span>
+        <ul class="nav-links">
+            <li><a href="#connect">Connect</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#goals">Goals</a></li>
+            <li><a href="/status/">Status</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Hero -->
+<div class="section hero">
+    <h1>Coinjoiner</h1>
+    <p class="subtitle">A 0% fee WabiSabi coordinator driving Bitcoin privacy towards resilience and decentralization.</p>
+    <a href="#connect" class="hero-cta">Get Connected</a>
+</div>
+
+<!-- Connect -->
+<div class="section" id="connect">
+    <h2>Connect to Coinjoiner</h2>
+    <p>Connect through Wasabi Wallet in two ways:</p>
+
+    <div class="connect-box">
+        <div class="copy-group">
+            <label>Auto-detect string</label>
+            <p>Copy this string and open Wasabi Wallet &mdash; it will detect the coordinator automatically.</p>
+            <div class="copy-field">
+                <code id="auto-string">name=Coinjoiner&network=main&coordinatorUri=https://api.coinjoiner.com/&readMore=https://coinjoiner.com/&absoluteMinInputCount=21</code>
+                <button class="copy-btn" onclick="copyText('auto-string', this)">Copy</button>
+            </div>
+        </div>
+
+        <div class="copy-group">
+            <label>Manual setup</label>
+            <p>Or paste the Coordinator URI directly into your Coordinator Settings.</p>
+            <div class="copy-field">
+                <code id="manual-uri">https://api.coinjoiner.com/</code>
+                <button class="copy-btn" onclick="copyText('manual-uri', this)">Copy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- About -->
+<div class="section" id="about">
+    <h2>The Problem with Bitcoin Privacy</h2>
+    <p>Privacy has always been a major challenge in Bitcoin. From centralized mixers to various coinjoin techniques, very few solutions have survived. Governments have been extremely hostile not only to mixing services but even to developers who write privacy code, pushing privacy-seeking users toward altcoins like Monero.</p>
+
+    <p>Today, the only practical on-chain privacy solutions still alive on Bitcoin are <strong>WabiSabi coinjoins</strong> and <strong>JoinMarket</strong>. We believe WabiSabi is theoretically superior in almost every regard. Currently, the only widely used client that implements WabiSabi is Wasabi Wallet (and its forks).</p>
+
+    <h3>Wasabi's past doesn't have to be Bitcoin privacy's future</h3>
+    <p>Wasabi Wallet has suffered reputational damage due to controversial decisions by its original company (zkSNACKs), including hiring blockchain surveillance firms and blacklisting UTXOs<a href="#ref1" class="ref">[1]</a>, as well as client-side vulnerabilities that could have undermined user privacy<a href="#ref2" class="ref">[2]</a>.</p>
+
+    <p>However, Wasabi Wallet is fully open-source and continued working perfectly even after zkSNACKs shut down their coordinator. Since then, independent coordinators have emerged (see: <a href="https://liquisabi.com">liquisabi.com</a>), proving the protocol itself is sound and can survive State-level attacks.</p>
+
+    <h3>How Coinjoiner funds development</h3>
+    <p>Coinjoiner uses <strong>leftover dust</strong> from coinjoins to fund development. There is no coordinator fee. The revenue comes from rare leftover change that may occur in some coinjoins:</p>
+
+    <blockquote>
+        In rare cases the output decomposition contains change (maximum of 10,000 sats per coinjoin), this leftover goes to the coordinator. This is because creating such small amounts would harm privacy and ends up being more expensive than just forfeiting it.
+    </blockquote>
+
+    <p>It is the most cost-efficient way for privacy seekers to make their coins private while <strong>directly contributing</strong> to the long-term health of Bitcoin privacy tools.</p>
+
+    <div class="references">
+        <p id="ref1">[1] <a href="https://bitcointalk.org/index.php?topic=5405325.0">bitcointalk.org/index.php?topic=5405325.0</a></p>
+        <p id="ref2">[2] <a href="https://github.com/GingerPrivacy/GingerWallet/discussions/116">github.com/GingerPrivacy/GingerWallet/discussions/116</a></p>
+    </div>
+</div>
+
+<!-- Goals -->
+<div class="section" id="goals">
+    <h2>Where We Want to Take Bitcoin Privacy</h2>
+    <p>We see significant room for improvement:</p>
+
+    <ul class="goals-list">
+        <li><strong>Mitigate coordinator partitioning attacks</strong> &mdash; addressing vectors like blinding keys and round IDs so WabiSabi can become truly trustless.</li>
+        <li><strong>Improve the user experience</strong> &mdash; pay-to-many support, discovering coordinators via Nostr without relying on any single third party.</li>
+        <li><strong>Build a light client</strong> &mdash; resistant to supply-chain attacks, making privacy accessible without trusting a full software distribution.</li>
+    </ul>
+
+    <p style="margin-top: 28px;">Bitcoin deserves robust privacy solutions that no single entity can shut down. Coinjoiner is our contribution to that future.</p>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-inner">
+        <span class="footer-text">Coinjoiner &mdash; Privacy for Bitcoin</span>
+        <div class="footer-links">
+            <a href="/status/">Status</a>
+            <a href="https://bitcointalk.org/index.php?topic=1159946.msg66150778#msg66150778">PGP</a>
+            <a href="https://github.com/Coinjoiner21" aria-label="GitHub">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            </a>
+            <a href="https://x.com/coinjoinercom" aria-label="X (Twitter)">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function copyText(elementId, button) {
+        const text = document.getElementById(elementId).textContent;
+        navigator.clipboard.writeText(text).then(function() {
+            button.textContent = 'Copied!';
+            button.classList.add('copied');
+            setTimeout(function() {
+                button.textContent = 'Copy';
+                button.classList.remove('copied');
+            }, 2000);
+        });
+    }
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            var target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
