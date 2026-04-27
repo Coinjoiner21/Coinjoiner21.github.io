@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coinjoiner - WabiSabi Coordinator for Bitcoin Privacy</title>
+    <title>Coinjoiner - WabiSabi Coordinator</title>
     <meta name="description" content="Coinjoiner is a 0% fee WabiSabi coordinator for Wasabi Wallet, improving Bitcoin privacy through decentralized coinjoins.">
     <meta property="og:title" content="Coinjoiner - WabiSabi Coordinator">
     <meta property="og:description" content="0% fee WabiSabi coordinator improving Bitcoin privacy.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://coinjoiner.com">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
         *, *::before, *::after {
             box-sizing: border-box;
@@ -16,127 +17,209 @@
             padding: 0;
         }
 
+        :root {
+            --red: #c1121f;
+            --red-dark: #8e0d17;
+            --ink: #1a1a1a;
+            --muted: #555;
+            --rule: #1a1a1a;
+            --paper: #fdfdfd;
+            --paper-2: #f4f1ea;
+        }
+
+        html, body {
+            background: var(--paper);
+            color: var(--ink);
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.7;
-            background: #0a0a0a;
-            color: #d0d0d0;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            line-height: 1.65;
+            font-size: 17px;
         }
 
         a {
-            color: #ff9900;
-            text-decoration: none;
+            color: var(--red);
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 2px;
         }
 
         a:hover {
-            text-decoration: underline;
+            background: var(--red);
+            color: #fff;
+            text-decoration: none;
         }
 
-        /* Navigation */
+        /* Top masthead */
         nav {
-            position: sticky;
-            top: 0;
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #1a1a1a;
-            z-index: 100;
+            border-bottom: 2px solid var(--ink);
+            background: var(--paper);
         }
 
         .nav-inner {
-            max-width: 900px;
+            max-width: 960px;
             margin: 0 auto;
-            padding: 14px 24px;
+            padding: 18px 28px 14px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .nav-brand {
-            font-size: 1.2em;
+            font-family: Georgia, serif;
+            font-size: 1.5em;
             font-weight: 700;
-            color: #ff9900;
+            color: var(--ink);
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+
+        .nav-brand:hover {
+            background: transparent;
+            color: var(--ink);
+        }
+
+        .nav-brand::first-letter {
+            color: var(--red);
         }
 
         .nav-links {
             display: flex;
-            gap: 24px;
+            gap: 22px;
             list-style: none;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-size: 0.72em;
         }
 
         .nav-links a {
-            color: #999;
-            font-size: 0.9em;
-            transition: color 0.2s;
+            color: var(--ink);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            padding-bottom: 1px;
         }
 
         .nav-links a:hover {
-            color: #ff9900;
-            text-decoration: none;
+            background: transparent;
+            color: var(--red);
+            border-bottom-color: var(--red);
+        }
+
+        .nav-links a.active {
+            color: var(--red);
+            border-bottom-color: var(--red);
         }
 
         /* Sections */
         .section {
-            max-width: 900px;
+            max-width: 960px;
             margin: 0 auto;
-            padding: 60px 24px;
+            padding: 48px 28px;
         }
 
-        .section + .section {
-            border-top: 1px solid #151515;
-        }
-
-        /* Hero */
+        /* Hero — more editorial, less centered marketing */
         .hero {
-            padding: 80px 24px;
-            text-align: center;
+            padding: 56px 28px 40px;
+            border-bottom: 1px solid var(--ink);
+        }
+
+        .hero .kicker {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.72em;
+            letter-spacing: 2.4px;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 18px;
+            display: inline-block;
+            border-top: 2px solid var(--red);
+            border-bottom: 2px solid var(--red);
+            padding: 4px 0;
         }
 
         .hero h1 {
-            font-size: 2.8em;
-            color: #ff9900;
-            margin-bottom: 12px;
-            letter-spacing: -0.5px;
+            font-size: 4.2em;
+            line-height: 0.98;
+            color: var(--ink);
+            margin-bottom: 18px;
+            letter-spacing: -1.5px;
+            font-weight: 700;
+        }
+
+        .hero h1 .dot {
+            color: var(--red);
         }
 
         .hero .subtitle {
-            font-size: 1.2em;
-            color: #888;
-            max-width: 550px;
-            margin: 0 auto 36px;
+            font-size: 1.25em;
+            color: var(--muted);
+            max-width: 620px;
+            font-style: italic;
         }
 
         .hero-cta {
             display: inline-block;
-            background: #ff9900;
-            color: #0a0a0a;
-            padding: 12px 32px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 1em;
-            transition: background 0.2s;
+            background: var(--red);
+            color: #fff;
+            padding: 10px 22px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.85em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-decoration: none;
+            margin-top: 28px;
+            border: 2px solid var(--red);
         }
 
         .hero-cta:hover {
-            background: #e68a00;
-            text-decoration: none;
+            background: #fff;
+            color: var(--red);
         }
 
         /* Headings */
         h2 {
-            color: #ff9900;
-            font-size: 1.6em;
-            margin-bottom: 20px;
+            color: var(--ink);
+            font-size: 2em;
+            margin-bottom: 18px;
+            letter-spacing: -0.5px;
+            line-height: 1.15;
+            position: relative;
+            padding-top: 14px;
+        }
+
+        h2::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 56px;
+            height: 4px;
+            background: var(--red);
         }
 
         h3 {
-            color: #e0e0e0;
-            font-size: 1.15em;
+            color: var(--ink);
+            font-size: 1.2em;
             margin-top: 28px;
             margin-bottom: 8px;
+            font-style: italic;
+            font-weight: 700;
         }
 
         p + p {
             margin-top: 14px;
+        }
+
+        p {
+            color: #2a2a2a;
+        }
+
+        strong {
+            color: var(--ink);
         }
 
         ul {
@@ -150,22 +233,32 @@
 
         /* Connect box */
         .connect-box {
-            background: #111;
-            border: 1px solid #222;
-            border-radius: 10px;
+            background: var(--paper-2);
+            border: 1px solid var(--ink);
             padding: 24px;
-            margin-top: 20px;
+            margin-top: 22px;
+            position: relative;
+        }
+
+        .connect-box::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            height: 6px;
+            background: var(--red);
         }
 
         .connect-box p {
             margin-bottom: 12px;
-            color: #aaa;
+            color: #333;
             font-size: 0.95em;
         }
 
         .copy-group {
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
         }
 
         .copy-group:last-child {
@@ -174,150 +267,253 @@
 
         .copy-group label {
             display: block;
-            font-size: 0.85em;
-            color: #777;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.72em;
+            color: var(--red);
             margin-bottom: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1.5px;
+            font-weight: 700;
         }
 
         .copy-field {
             display: flex;
             gap: 0;
-            border-radius: 6px;
-            overflow: hidden;
-            border: 1px solid #2a2a2a;
+            border: 1px solid var(--ink);
+            background: #fff;
         }
 
         .copy-field code {
             flex: 1;
-            padding: 12px 14px;
-            background: #0d0d0d;
-            color: #ccc;
+            padding: 11px 14px;
+            color: var(--ink);
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 0.85em;
+            font-size: 0.82em;
             overflow-x: auto;
             white-space: nowrap;
         }
 
         .copy-btn {
-            padding: 12px 18px;
-            background: #1a1a1a;
-            color: #ff9900;
+            padding: 11px 18px;
+            background: var(--ink);
+            color: #fff;
             border: none;
             cursor: pointer;
-            font-size: 0.85em;
-            font-weight: 600;
-            transition: background 0.2s;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.75em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
             white-space: nowrap;
-            font-family: inherit;
         }
 
         .copy-btn:hover {
-            background: #222;
+            background: var(--red);
         }
 
         .copy-btn.copied {
-            color: #4caf50;
+            background: var(--red-dark);
         }
 
-        /* Blockquote */
+        /* Pull quote */
         blockquote {
-            background: #111;
-            border-left: 3px solid #ff9900;
-            padding: 16px 20px;
-            margin: 16px 0;
-            border-radius: 0 6px 6px 0;
-            color: #aaa;
-            font-size: 0.92em;
+            border-left: 4px solid var(--red);
+            padding: 4px 0 4px 22px;
+            margin: 22px 0;
+            color: #333;
+            font-size: 1.1em;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        /* Closing Satoshi pull-quote */
+        .satoshi-quote {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 64px 28px;
+            text-align: center;
+            border-top: 1px solid var(--ink);
+        }
+
+        .satoshi-quote q {
+            display: block;
+            font-size: 1.4em;
+            font-style: italic;
+            line-height: 1.45;
+            color: var(--ink);
+            max-width: 720px;
+            margin: 0 auto 22px;
+            quotes: none;
+        }
+
+        .satoshi-quote q::before {
+            content: '\201C';
+            color: var(--red);
+            font-size: 1.6em;
+            line-height: 0;
+            vertical-align: -0.25em;
+            margin-right: 4px;
+        }
+
+        .satoshi-quote q::after {
+            content: '\201D';
+            color: var(--red);
+            font-size: 1.6em;
+            line-height: 0;
+            vertical-align: -0.25em;
+            margin-left: 4px;
+        }
+
+        .satoshi-quote cite {
+            display: inline-block;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.78em;
+            text-transform: uppercase;
+            letter-spacing: 1.8px;
+            color: var(--red);
+            font-style: normal;
+            font-weight: 700;
+            border-top: 2px solid var(--red);
+            padding-top: 8px;
         }
 
         /* Goals list */
         .goals-list {
             list-style: none;
             padding: 0;
+            margin-top: 16px;
+            counter-reset: goal;
         }
 
         .goals-list li {
-            padding: 14px 0;
-            border-bottom: 1px solid #151515;
-            padding-left: 20px;
+            padding: 18px 0 18px 56px;
+            border-top: 1px solid var(--ink);
             position: relative;
+            counter-increment: goal;
         }
 
         .goals-list li::before {
-            content: '';
+            content: counter(goal, decimal-leading-zero);
             position: absolute;
             left: 0;
-            top: 22px;
-            width: 8px;
-            height: 8px;
-            background: #ff9900;
-            border-radius: 50%;
+            top: 16px;
+            color: var(--red);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-weight: 700;
+            font-size: 1.4em;
+            letter-spacing: -0.5px;
         }
 
         .goals-list li:last-child {
-            border-bottom: none;
+            border-bottom: 1px solid var(--ink);
+        }
+
+        /* PR list */
+        .pr-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 16px;
+        }
+
+        .pr-list li {
+            padding: 14px 0;
+            border-top: 1px solid #ccc;
+        }
+
+        .pr-list li:last-child {
+            border-bottom: 1px solid #ccc;
+        }
+
+        .pr-list .pr-title {
+            font-weight: 700;
+        }
+
+        .pr-list .pr-meta {
+            display: block;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.78em;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
         }
 
         /* Refs */
         .ref {
-            font-size: 0.85em;
-            color: #666;
+            font-size: 0.75em;
+            color: var(--red);
             vertical-align: super;
+            text-decoration: none;
+        }
+
+        .ref:hover {
+            background: transparent;
+            color: var(--red-dark);
         }
 
         .references {
-            margin-top: 30px;
-            font-size: 0.85em;
-            color: #555;
+            margin-top: 36px;
+            padding-top: 16px;
+            border-top: 1px solid #ccc;
+            font-size: 0.82em;
+            color: var(--muted);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .references p {
+            color: var(--muted);
         }
 
         .references a {
-            color: #777;
+            color: var(--muted);
             word-break: break-all;
         }
 
         /* Footer */
         footer {
-            border-top: 1px solid #151515;
-            padding: 30px 24px;
-            text-align: center;
+            border-top: 2px solid var(--ink);
+            padding: 24px 28px;
+            margin-top: 30px;
+            background: var(--paper);
         }
 
         .footer-inner {
-            max-width: 900px;
+            max-width: 960px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.8em;
         }
 
         .footer-text {
-            color: #555;
-            font-size: 0.85em;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
         }
 
         .footer-links {
             display: flex;
-            gap: 20px;
+            gap: 18px;
             align-items: center;
         }
 
         .footer-links a {
-            color: #666;
-            transition: color 0.2s;
+            color: var(--ink);
+            text-decoration: none;
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
         }
 
         .footer-links a:hover {
-            color: #ff9900;
-            text-decoration: none;
+            background: transparent;
+            color: var(--red);
         }
 
         .footer-links svg {
@@ -328,16 +524,24 @@
 
         /* Responsive */
         @media (max-width: 600px) {
+            body {
+                font-size: 17px;
+            }
+
             .hero h1 {
-                font-size: 2em;
+                font-size: 2.6em;
             }
 
             .hero .subtitle {
                 font-size: 1.05em;
             }
 
+            h2 {
+                font-size: 1.55em;
+            }
+
             .nav-links {
-                gap: 16px;
+                gap: 14px;
             }
 
             .footer-inner {
@@ -351,21 +555,22 @@
 
 <nav>
     <div class="nav-inner">
-        <span class="nav-brand">Coinjoiner</span>
+        <a href="/" class="nav-brand">Coinjoiner</a>
         <ul class="nav-links">
-            <li><a href="#connect">Connect</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#goals">Goals</a></li>
+            <li><a href="/" class="active">Home</a></li>
             <li><a href="/status/">Status</a></li>
         </ul>
     </div>
 </nav>
 
 <!-- Hero -->
-<div class="section hero">
-    <h1>Coinjoiner</h1>
-    <p class="subtitle">A 0% fee WabiSabi coordinator driving Bitcoin privacy towards resilience and decentralization.</p>
-    <a href="#connect" class="hero-cta">Get Connected</a>
+<div class="hero">
+    <div style="max-width: 960px; margin: 0 auto;">
+        <span class="kicker">WabiSabi Coordinator &middot; 0% Fee</span>
+        <h1>Coinjoiner<span class="dot">.</span></h1>
+        <p class="subtitle">Driving Bitcoin privacy towards resilience and decentralization.</p>
+        <a href="#connect" class="hero-cta">Get Connected &rarr;</a>
+    </div>
 </div>
 
 <!-- Connect -->
@@ -376,7 +581,7 @@
     <div class="connect-box">
         <div class="copy-group">
             <label>Auto-detect string</label>
-            <p>Copy this string and open Wasabi Wallet &mdash; it will detect the coordinator automatically.</p>
+            <p>Copy this string and open Wasabi Wallet - it will detect the coordinator automatically.</p>
             <div class="copy-field">
                 <code id="auto-string">name=Coinjoiner&network=main&coordinatorUri=https://api.coinjoiner.com/&readMore=https://coinjoiner.com/&absoluteMinInputCount=21</code>
                 <button class="copy-btn" onclick="copyText('auto-string', this)">Copy</button>
@@ -406,14 +611,37 @@
 
     <p>However, Wasabi Wallet is fully open-source and continued working perfectly even after zkSNACKs shut down their coordinator. Since then, independent coordinators have emerged (see: <a href="https://liquisabi.com">liquisabi.com</a>), proving the protocol itself is sound and can survive State-level attacks.</p>
 
-    <h3>How Coinjoiner funds development</h3>
-    <p>Coinjoiner uses <strong>leftover dust</strong> from coinjoins to fund development. There is no coordinator fee. The revenue comes from rare leftover change that may occur in some coinjoins:</p>
+    <h3>Our contributions to Wasabi Wallet</h3>
+    <p>Talk is cheap. Below are the patches we have authored and merged into <a href="https://github.com/WalletWasabi/WalletWasabi">Wasabi Wallet</a>:</p>
 
-    <blockquote>
-        In rare cases the output decomposition contains change (maximum of 10,000 sats per coinjoin), this leftover goes to the coordinator. This is because creating such small amounts would harm privacy and ends up being more expensive than just forfeiting it.
-    </blockquote>
+    <ul class="pr-list">
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14442" class="pr-title">Fix startup crash when RPC credentials are not configured in test networks</a>
+            <span class="pr-meta">#14442 &middot; merged 2026-03-31</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14453" class="pr-title">Friendly restart message instead of crash report during wallet recovery</a>
+            <span class="pr-meta">#14453 &middot; merged 2026-03-30</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14447" class="pr-title">Fix Loopback bug with Tor when the RPC URI is localhost</a>
+            <span class="pr-meta">#14447 &middot; merged 2026-03-27</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14369" class="pr-title">Add Pay-to-Many (batch payment) support in Send flow</a>
+            <span class="pr-meta">#14369 &middot; merged 2026-03-26</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14359" class="pr-title">Allow sub-1 sat/vB fee rates for client-side sends</a>
+            <span class="pr-meta">#14359 &middot; merged 2026-02-24</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14264" class="pr-title">Added GUI for batched payment in coinjoin</a>
+            <span class="pr-meta">#14264 &middot; merged 2026-01-30</span>
+        </li>
+    </ul>
 
-    <p>It is the most cost-efficient way for privacy seekers to make their coins private while <strong>directly contributing</strong> to the long-term health of Bitcoin privacy tools.</p>
+    <p style="margin-top: 18px;">See <a href="https://github.com/WalletWasabi/WalletWasabi/pulls?q=is%3Apr+author%3ACoinjoiner21">all our pull requests on GitHub</a> for current and ongoing work.</p>
 
     <div class="references">
         <p id="ref1">[1] <a href="https://bitcointalk.org/index.php?topic=5405325.0">bitcointalk.org/index.php?topic=5405325.0</a></p>
@@ -434,6 +662,12 @@
 
     <p style="margin-top: 28px;">Bitcoin deserves robust privacy solutions that no single entity can shut down. Coinjoiner is our contribution to that future.</p>
 </div>
+
+<!-- Closing quote -->
+<aside class="satoshi-quote">
+    <q>Governments are good at cutting off the heads of a centrally controlled networks like Napster, but pure P2P networks like Gnutella and Tor seem to be holding their own.</q>
+    <cite>&mdash; Satoshi Nakamoto</cite>
+</aside>
 
 <!-- Footer -->
 <footer>
