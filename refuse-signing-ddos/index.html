@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refuse-to-Sign Attack Budget - Coinjoiner</title>
+    <meta name="description" content="What it costs, in locked capital and mining fees, to stall WabiSabi coinjoins by refusing to sign, using the coordinator's real ban rules.">
+    <meta property="og:title" content="Refuse-to-Sign Attack Budget - Coinjoiner">
+    <meta property="og:description" content="The cost of a refuse-to-sign DoS against a WabiSabi coordinator, in locked capital and mining fees.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://coinjoiner.com/refuse-signing-ddos/">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --red: #c1121f;
+            --red-dark: #8e0d17;
+            --ink: #1a1a1a;
+            --muted: #555;
+            --paper: #fdfdfd;
+            --paper-2: #f4f1ea;
+            --rule-soft: #e5e0d2;
+            --warn-bg: #fbf3dc;
+            --sans: 'Helvetica Neue', Arial, sans-serif;
+            --mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
+        html, body {
+            background: var(--paper);
+            color: var(--ink);
+        }
+
+        body {
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            line-height: 1.65;
+            font-size: 17px;
+        }
+
+        a {
+            color: var(--red);
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 2px;
+        }
+
+        a:hover {
+            background: var(--red);
+            color: #fff;
+            text-decoration: none;
+        }
+
+        /* Top masthead */
+        nav {
+            border-bottom: 2px solid var(--ink);
+            background: var(--paper);
+        }
+
+        .nav-inner {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 18px 28px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .nav-brand {
+            font-family: Georgia, serif;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+
+        .nav-brand:hover {
+            background: transparent;
+            color: var(--ink);
+        }
+
+        .nav-brand::first-letter {
+            color: var(--red);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 22px;
+            list-style: none;
+            font-family: var(--sans);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-size: 0.72em;
+        }
+
+        .nav-links a {
+            color: var(--ink);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            padding-bottom: 1px;
+        }
+
+        .nav-links a:hover {
+            background: transparent;
+            color: var(--red);
+            border-bottom-color: var(--red);
+        }
+
+        /* Page */
+        .page {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 44px 28px 60px;
+        }
+
+        .page-header {
+            border-bottom: 1px solid var(--ink);
+            padding-bottom: 18px;
+            margin-bottom: 28px;
+        }
+
+        .kicker {
+            font-family: var(--sans);
+            font-size: 0.72em;
+            letter-spacing: 2.4px;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 14px;
+            display: inline-block;
+            border-top: 2px solid var(--red);
+            border-bottom: 2px solid var(--red);
+            padding: 4px 0;
+        }
+
+        .kicker a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .kicker a:hover {
+            background: var(--red);
+            color: #fff;
+        }
+
+        .page-header h1 {
+            font-size: 2.4em;
+            color: var(--ink);
+            letter-spacing: -0.8px;
+            line-height: 1.05;
+        }
+
+        .page-header h1::first-letter {
+            color: var(--red);
+        }
+
+        .page-header p {
+            color: var(--muted);
+            font-style: italic;
+            margin-top: 10px;
+            max-width: 680px;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            color: var(--ink);
+            margin-bottom: 12px;
+            padding-top: 14px;
+            position: relative;
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
+
+        h2::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 56px;
+            height: 4px;
+            background: var(--red);
+        }
+
+        h3 {
+            font-size: 1.05em;
+            font-style: italic;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        p {
+            color: #2a2a2a;
+        }
+
+        strong, b {
+            color: var(--ink);
+        }
+
+        code {
+            font-family: var(--mono);
+            font-size: 0.85em;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 32px;
+            align-items: start;
+        }
+
+        @media (min-width: 900px) {
+            .layout {
+                grid-template-columns: 310px minmax(0, 1fr);
+            }
+
+            aside.controls {
+                position: sticky;
+                top: 16px;
+                max-height: calc(100vh - 32px);
+                overflow-y: auto;
+            }
+        }
+
+        /* Parameters panel */
+        aside.controls {
+            background: var(--paper-2);
+            border: 1px solid var(--ink);
+            border-top: 6px solid var(--red);
+            padding: 18px 16px 20px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            background: var(--ink);
+            color: #fff;
+            border: 1px solid var(--ink);
+            cursor: pointer;
+            font-family: var(--sans);
+            font-size: 0.68em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            text-align: left;
+        }
+
+        .btn:hover {
+            background: var(--red);
+            border-color: var(--red);
+        }
+
+        .btn.secondary {
+            background: var(--paper);
+            color: var(--ink);
+        }
+
+        .btn.secondary:hover {
+            background: var(--ink);
+            border-color: var(--ink);
+            color: #fff;
+        }
+
+        .btn:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, svg:focus-visible {
+            outline: 2px solid var(--red);
+            outline-offset: 2px;
+        }
+
+        fieldset {
+            border: 0;
+            display: grid;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        legend {
+            font-family: var(--sans);
+            font-size: 0.72em;
+            color: var(--red);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .row label {
+            font-size: 0.86em;
+            line-height: 1.3;
+            color: var(--ink);
+        }
+
+        .row.stack {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 6px;
+        }
+
+        .hint {
+            display: block;
+            font-family: var(--sans);
+            font-size: 0.78em;
+            color: var(--muted);
+            line-height: 1.35;
+            margin-top: 2px;
+        }
+
+        .field {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .unit {
+            font-family: var(--sans);
+            font-size: 0.7em;
+            color: var(--muted);
+            min-width: 38px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        input[type="number"], select {
+            font-family: var(--mono);
+            font-size: 0.8em;
+            width: 88px;
+            padding: 6px 8px;
+            border: 1px solid var(--ink);
+            border-radius: 0;
+            background: #fff;
+            color: var(--ink);
+            text-align: right;
+        }
+
+        select {
+            width: 100%;
+            text-align: left;
+            font-family: Georgia, serif;
+            font-size: 0.86em;
+        }
+
+        input[aria-invalid="true"] {
+            border-color: var(--red);
+            background: #fff2f2;
+        }
+
+        .seg {
+            display: grid;
+            gap: 8px;
+        }
+
+        .seg > label {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            font-size: 0.86em;
+            line-height: 1.35;
+            cursor: pointer;
+        }
+
+        .seg input[type="radio"] {
+            margin-top: 3px;
+            accent-color: var(--red);
+        }
+
+        .sub {
+            display: grid;
+            gap: 8px;
+            padding-left: 12px;
+            border-left: 2px solid var(--red);
+            margin-left: 5px;
+        }
+
+        .derived {
+            font-family: var(--sans);
+            font-size: 0.74em;
+            color: var(--muted);
+            line-height: 1.45;
+        }
+
+        .derived b {
+            color: var(--ink);
+        }
+
+        .sep {
+            height: 0;
+            border: 0;
+            border-top: 1px solid var(--ink);
+        }
+
+        /* Results */
+        main.results {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 40px;
+            min-width: 0;
+        }
+
+        main.results > * {
+            min-width: 0;
+        }
+
+        .summary {
+            display: grid;
+            gap: 16px;
+        }
+
+        .headline {
+            font-size: 1.55em;
+            line-height: 1.25;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--ink);
+        }
+
+        .banline {
+            background: var(--paper-2);
+            border: 1px solid var(--ink);
+            border-left: 4px solid var(--red);
+            padding: 14px 18px;
+            display: grid;
+            gap: 6px;
+            font-size: 0.95em;
+        }
+
+        .formula {
+            font-family: var(--mono);
+            font-size: 0.78em;
+            color: var(--muted);
+            overflow-wrap: anywhere;
+            line-height: 1.5;
+        }
+
+        .section-note {
+            color: var(--muted);
+            font-style: italic;
+            font-size: 0.95em;
+            margin-bottom: 16px;
+            max-width: 640px;
+        }
+
+        /* Strategy cards (status-page card grid) */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            border: 1px solid var(--ink);
+        }
+
+        .card {
+            background: var(--paper);
+            padding: 18px 20px 20px;
+            display: grid;
+            gap: 12px;
+            align-content: start;
+            position: relative;
+        }
+
+        .card + .card {
+            border-left: 1px solid var(--ink);
+        }
+
+        @media (max-width: 620px) {
+            .card + .card {
+                border-left: 0;
+                border-top: 1px solid var(--ink);
+            }
+        }
+
+        .card.best::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            height: 6px;
+            background: var(--red);
+        }
+
+        .card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .card-label {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-family: var(--sans);
+            font-size: 0.74em;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--ink);
+            font-weight: 700;
+        }
+
+        .key {
+            width: 18px;
+            height: 3px;
+            flex: none;
+            display: inline-block;
+        }
+
+        .key.s1 { background: var(--ink); }
+        .key.s2 { background: var(--red); }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 9px;
+            font-family: var(--sans);
+            font-size: 0.66em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--red);
+            color: #fff;
+            border: 1px solid var(--red);
+            white-space: nowrap;
+        }
+
+        .card p.how {
+            font-size: 0.9em;
+            color: #333;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        dl.kv {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 7px 14px;
+            font-size: 0.9em;
+        }
+
+        dl.kv dt {
+            color: #333;
+        }
+
+        dl.kv dd {
+            text-align: right;
+            font-family: var(--sans);
+            font-variant-numeric: tabular-nums;
+            font-size: 0.95em;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        dl.kv dd small {
+            display: block;
+            color: var(--muted);
+            font-size: 0.8em;
+            font-weight: 400;
+        }
+
+        dl.kv .total {
+            border-top: 1px solid var(--ink);
+            padding-top: 8px;
+            font-weight: 700;
+        }
+
+        dl.kv dd.total {
+            color: var(--red);
+            font-size: 1.05em;
+        }
+
+        .flag {
+            background: var(--warn-bg);
+            border: 1px solid var(--ink);
+            border-left: 4px solid var(--red);
+            padding: 9px 12px;
+            font-size: 0.86em;
+            font-style: italic;
+            color: #333;
+            line-height: 1.45;
+        }
+
+        .owned {
+            display: grid;
+            gap: 10px;
+        }
+
+        .owned p {
+            max-width: 680px;
+        }
+
+        /* Tables (status-page history table) */
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid var(--ink);
+        }
+
+        .data-table th {
+            text-align: left;
+            font-family: var(--sans);
+            font-size: 0.66em;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--red);
+            padding: 11px 12px;
+            border-bottom: 1px solid var(--ink);
+            background: var(--paper-2);
+            font-weight: 700;
+            vertical-align: bottom;
+        }
+
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--rule-soft);
+            font-size: 0.88em;
+            color: var(--ink);
+            vertical-align: top;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table .n {
+            text-align: right;
+            font-family: var(--sans);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        .data-table tr.current td {
+            background: var(--paper-2);
+        }
+
+        .data-table tr.current td:first-child {
+            box-shadow: inset 4px 0 0 var(--red);
+        }
+
+        .sub-t {
+            display: block;
+            color: var(--muted);
+            font-family: var(--sans);
+            font-size: 0.8em;
+        }
+
+        /* Charts */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            font-family: var(--sans);
+            font-size: 0.74em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--ink);
+            margin-bottom: 10px;
+        }
+
+        .legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .charts {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 16px;
+        }
+
+        .panel {
+            border: 1px solid var(--ink);
+            background: var(--paper);
+            padding: 14px 14px 6px;
+            position: relative;
+            min-width: 0;
+        }
+
+        .panel-title {
+            font-family: var(--sans);
+            font-size: 0.72em;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--red);
+            font-weight: 700;
+        }
+
+        .axis-note {
+            font-size: 0.82em;
+            font-style: italic;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .panel svg {
+            display: block;
+            width: 100%;
+            height: 240px;
+            overflow: visible;
+        }
+
+        .tip {
+            position: absolute;
+            pointer-events: none;
+            background: var(--paper);
+            border: 1px solid var(--ink);
+            padding: 8px 10px;
+            font-family: var(--sans);
+            font-size: 0.74em;
+            min-width: 180px;
+            z-index: 2;
+        }
+
+        .tip .t-h {
+            color: var(--red);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .tip .t-r {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .tip .t-r span:first-child {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--muted);
+        }
+
+        .tip .t-r b {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .chart-paused {
+            background: var(--paper-2);
+            border: 1px solid var(--ink);
+            padding: 20px;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        details {
+            margin-top: 12px;
+        }
+
+        summary {
+            cursor: pointer;
+            font-family: var(--sans);
+            font-size: 0.74em;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--ink);
+        }
+
+        details .table-wrap {
+            margin-top: 12px;
+        }
+
+        /* Facts */
+        .facts {
+            list-style: none;
+            border-top: 1px solid var(--ink);
+        }
+
+        .facts li {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--rule-soft);
+            display: grid;
+            gap: 6px;
+        }
+
+        .facts li:last-child {
+            border-bottom: 1px solid var(--ink);
+        }
+
+        .facts p {
+            font-size: 0.95em;
+            max-width: 680px;
+        }
+
+        .src {
+            font-family: var(--mono);
+            font-size: 0.72em;
+            color: var(--muted);
+            overflow-wrap: anywhere;
+        }
+
+        ul.plain {
+            padding-left: 20px;
+            display: grid;
+            gap: 8px;
+            font-size: 0.95em;
+            max-width: 680px;
+        }
+
+        .info-box {
+            background: var(--paper-2);
+            border: 1px solid var(--ink);
+            border-left: 4px solid var(--red);
+            padding: 18px 22px;
+            font-size: 0.95em;
+            color: #333;
+            font-style: italic;
+        }
+
+        .info-box strong {
+            font-style: normal;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 2px solid var(--ink);
+            padding: 24px 28px;
+            margin-top: 30px;
+            background: var(--paper);
+        }
+
+        .footer-inner {
+            max-width: 960px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-family: var(--sans);
+            font-size: 0.8em;
+        }
+
+        .footer-text {
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
+
+        .footer-links a {
+            color: var(--ink);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        .footer-links a:hover {
+            background: transparent;
+            color: var(--red);
+        }
+
+        .footer-links svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                font-size: 16px;
+            }
+
+            .page {
+                padding: 32px 16px 48px;
+            }
+
+            .nav-inner {
+                padding: 18px 16px 14px;
+            }
+
+            .page-header h1 {
+                font-size: 1.7em;
+            }
+
+            .headline {
+                font-size: 1.3em;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-inner">
+        <a href="/" class="nav-brand">Coinjoiner</a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/status/">Status</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="page">
+
+    <div class="page-header">
+        <span class="kicker">WabiSabi DoS &middot; <a href="https://github.com/WalletWasabi/WalletWasabi/issues/15091">Issue #15091</a></span>
+        <h1>Refuse-to-Sign Attack Budget</h1>
+        <p>An attacker registers coins in a coinjoin round, then refuses to sign with one of them. The round fails, a blame round starts, and the attacker does it again. This calculator uses the coordinator's real ban rules to work out what keeping that up costs: capital tied up in banned coins, and mining fees.</p>
+    </div>
+
+    <div class="layout">
+        <aside class="controls" aria-label="Parameters">
+            <div class="presets">
+                <button type="button" class="btn" id="preset-defaults">Coordinator defaults</button>
+                <button type="button" class="btn secondary" id="preset-example">Example: 1,000 &times; 10k sats, 30 min rounds</button>
+            </div>
+
+            <fieldset>
+                <legend>Attack</legend>
+                <div class="row">
+                    <label for="days">Attack length</label>
+                    <span class="field"><input type="number" id="days" min="0.05" max="365" step="any"><span class="unit">days</span></span>
+                </div>
+                <div class="row">
+                    <label for="lanes">Rounds kept failing at once<span class="hint">The coordinator opens a new round while a blame chain runs</span></label>
+                    <span class="field"><input type="number" id="lanes" min="1" max="20" step="1"><span class="unit">rounds</span></span>
+                </div>
+                <div class="seg" role="radiogroup" aria-label="Downtime bought by one refusal">
+                    <label><input type="radio" name="cycleMode" id="cycle-blame" value="blame"> One refusal costs honest users one blame round (what the code does)</label>
+                    <div class="sub" id="blame-fields">
+                        <div class="row"><label for="tBlameReg">Blame input registration</label><span class="field"><input type="number" id="tBlameReg" min="0" max="120" step="any"><span class="unit">min</span></span></div>
+                        <div class="row"><label for="tConfirm">Connection confirmation</label><span class="field"><input type="number" id="tConfirm" min="0" max="60" step="any"><span class="unit">min</span></span></div>
+                        <div class="row"><label for="tOutput">Output registration</label><span class="field"><input type="number" id="tOutput" min="0" max="60" step="any"><span class="unit">min</span></span></div>
+                        <div class="row"><label for="tSign">Signing timeout</label><span class="field"><input type="number" id="tSign" min="0.1" max="60" step="any"><span class="unit">min</span></span></div>
+                        <div class="row"><label for="maxInputs">Max inputs per round</label><span class="field"><input type="number" id="maxInputs" min="2" max="2000" step="1"><span class="unit">inputs</span></span></div>
+                        <div class="row"><label for="minBlame">Min inputs for a blame round</label><span class="field"><input type="number" id="minBlame" min="1" max="2000" step="1"><span class="unit">inputs</span></span></div>
+                        <div class="derived" id="cycle-derived"></div>
+                    </div>
+                    <label><input type="radio" name="cycleMode" id="cycle-round" value="round"> One refusal costs a full round</label>
+                    <div class="sub" id="round-fields">
+                        <div class="row"><label for="roundMin">Round length</label><span class="field"><input type="number" id="roundMin" min="1" max="600" step="any"><span class="unit">min</span></span></div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <hr class="sep">
+
+            <fieldset>
+                <legend>Coordinator ban rule</legend>
+                <div class="seg" role="radiogroup" aria-label="Ban length rule">
+                    <label><input type="radio" name="banMode" id="ban-formula" value="formula"> Wasabi formula: severity &divide; coin value</label>
+                    <div class="sub" id="formula-fields">
+                        <div class="row"><label for="severity">DoS severity<span class="hint">Bigger coins get shorter bans</span></label><span class="field"><input type="number" id="severity" min="0.0001" max="1000" step="any"><span class="unit">BTC&middot;h</span></span></div>
+                        <div class="row"><label for="factor">Penalty factor, didn't sign</label><span class="field"><input type="number" id="factor" min="0" max="100" step="any"><span class="unit">&times;</span></span></div>
+                    </div>
+                    <label><input type="radio" name="banMode" id="ban-fixed" value="fixed"> Same ban for every coin</label>
+                    <div class="sub" id="fixed-fields">
+                        <div class="row"><label for="fixedHours">Ban length</label><span class="field"><input type="number" id="fixedHours" min="0.01" max="100000" step="any"><span class="unit">hours</span></span></div>
+                    </div>
+                </div>
+                <div class="row"><label for="mult">Repeat multiplier<span class="hint">Per earlier offense of the same coin</span></label><span class="field"><input type="number" id="mult" min="1" max="10" step="any"><span class="unit">&times;</span></span></div>
+                <div class="row"><label for="minPrison">Minimum ban<span class="hint">Shorter bans are dropped to zero</span></label><span class="field"><input type="number" id="minPrison" min="0" max="10000" step="any"><span class="unit">min</span></span></div>
+                <div class="row stack">
+                    <label for="inherit">Coins spent from a banned coin</label>
+                    <select id="inherit">
+                        <option value="none">Start clean (master today)</option>
+                        <option value="half">Inherit half the ban per spend (#15091)</option>
+                        <option value="full">Inherit the full ban</option>
+                    </select>
+                </div>
+            </fieldset>
+
+            <hr class="sep">
+
+            <fieldset>
+                <legend>Attacker's coins</legend>
+                <div class="row"><label for="coinSats">Coin size<span class="hint">Coordinator minimum is 5,000 sats</span></label><span class="field"><input type="number" id="coinSats" min="5000" max="4300000000000" step="any"><span class="unit">sats</span></span></div>
+                <div class="row"><label for="coinsOwned">Coins the attacker owns</label><span class="field"><input type="number" id="coinsOwned" min="1" max="10000000" step="1"><span class="unit">coins</span></span></div>
+            </fieldset>
+
+            <hr class="sep">
+
+            <fieldset>
+                <legend>Bitcoin costs</legend>
+                <div class="row"><label for="feeRate">Fee rate</label><span class="field"><input type="number" id="feeRate" min="0.1" max="2000" step="any"><span class="unit">sat/vB</span></span></div>
+                <div class="row"><label for="respendVb">Respend one banned coin<span class="hint">1 in, 1 out P2TR &asymp; 111 vB</span></label><span class="field"><input type="number" id="respendVb" min="1" max="1000" step="any"><span class="unit">vB</span></span></div>
+                <div class="row"><label for="coinLifeVb">Create a coin, later sweep it<span class="hint">One output now plus one input later &asymp; 100 vB</span></label><span class="field"><input type="number" id="coinLifeVb" min="0" max="1000" step="any"><span class="unit">vB</span></span></div>
+                <div class="row"><label for="confMin">Wait for a confirmation<span class="hint">Inputs need one confirmation to register</span></label><span class="field"><input type="number" id="confMin" min="0" max="10000" step="any"><span class="unit">min</span></span></div>
+                <div class="row"><label for="capitalRate">Cost of capital</label><span class="field"><input type="number" id="capitalRate" min="0" max="1000" step="any"><span class="unit">%/year</span></span></div>
+            </fieldset>
+        </aside>
+
+        <main class="results" aria-live="polite">
+            <section class="summary">
+                <p class="headline" id="headline"></p>
+                <div class="banline" id="banline"></div>
+            </section>
+
+            <section>
+                <h2>Two Ways to Keep It Going</h2>
+                <p class="section-note">Coins needed to go the full length, and what each route costs. Mining fees include creating and later sweeping every coin the attacker uses.</p>
+                <div class="cards">
+                    <div class="card" id="card-wait">
+                        <div class="card-head">
+                            <div class="card-label"><span class="key s1"></span>Wait out the bans</div>
+                            <span class="badge" id="chip-wait" hidden>Cheapest</span>
+                        </div>
+                        <p class="how">Never spend a banned coin. Reuse a coin only after its ban ends, and bring in a new coin when none is free.</p>
+                        <dl class="kv" id="kv-wait"></dl>
+                        <div class="flag" id="flag-wait" hidden></div>
+                    </div>
+                    <div class="card" id="card-respend">
+                        <div class="card-head">
+                            <div class="card-label"><span class="key s2"></span>Respend banned coins</div>
+                            <span class="badge" id="chip-respend" hidden>Cheapest</span>
+                        </div>
+                        <p class="how">Spend each banned coin to a new address right away, as many times as needed, so it can register again after one confirmation.</p>
+                        <dl class="kv" id="kv-respend"></dl>
+                        <div class="flag" id="flag-respend" hidden></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="owned">
+                <h2>With the Coins the Attacker Owns</h2>
+                <p id="owned-wait"></p>
+                <p id="owned-respend"></p>
+            </section>
+
+            <section>
+                <h2>What Ban Inheritance Changes</h2>
+                <p class="section-note" id="inherit-note"></p>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Coins spent from a banned coin</th>
+                                <th class="n">Respends per ban</th>
+                                <th class="n">Respend route</th>
+                                <th class="n">Wait-out route</th>
+                                <th class="n">Cheapest</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inherit-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>How Coin Size Changes the Bill</h2>
+                <p class="section-note">Same attack, every coin size from the 5,000-sat minimum to 10 BTC. The vertical line marks the coin size you picked.</p>
+                <div class="legend" aria-hidden="true">
+                    <span><span class="key s1"></span>Wait out the bans</span>
+                    <span><span class="key s2"></span>Respend banned coins</span>
+                </div>
+                <div class="charts" id="charts">
+                    <div class="panel" id="panel-capital">
+                        <div class="panel-title">Capital tied up</div>
+                        <p class="axis-note">BTC, log scale</p>
+                        <svg id="svg-capital" tabindex="0" role="img" aria-label="Capital tied up by coin size"></svg>
+                        <div class="tip" hidden></div>
+                    </div>
+                    <div class="panel" id="panel-fees">
+                        <div class="panel-title">Mining fees</div>
+                        <p class="axis-note">sats, log scale</p>
+                        <svg id="svg-fees" tabindex="0" role="img" aria-label="Mining fees by coin size"></svg>
+                        <div class="tip" hidden></div>
+                    </div>
+                </div>
+                <div class="chart-paused" id="chart-paused" hidden></div>
+                <details>
+                    <summary>Show chart data as a table</summary>
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead><tr><th class="n">Coin size</th><th class="n">Wait: capital</th><th class="n">Wait: fees</th><th class="n">Respend: capital</th><th class="n">Respend: fees</th></tr></thead>
+                            <tbody id="chart-table"></tbody>
+                        </table>
+                    </div>
+                </details>
+            </section>
+
+            <section>
+                <h2>What the Coordinator Actually Does</h2>
+                <ul class="facts">
+                    <li>
+                        <h3>A ban is a fixed amount of BTC-hours</h3>
+                        <p>Ban length is <code>DoSSeverity &divide; coin value &times; penalty factor &times; 1.3^(offenses &minus; 1)</code>. Coin value &times; ban length therefore always comes to 0.1 BTC&middot;h on a first refusal. A 10,000-sat coin sits out 1,000 hours; a 0.3 BTC coin sits out 20 minutes.</p>
+                        <span class="src">Prison.cs, GetBanTimePeriod &middot; WabiSabiConfig.cs: DoSSeverity = 0.1 BTC</span>
+                    </li>
+                    <li>
+                        <h3>Short bans are thrown away</h3>
+                        <p>Any ban under <code>DoSMinTimeInPrison</code> (20 min) becomes zero. With the default severity, a coin above 0.3 BTC is not banned at all on its first refusal. A 1 BTC coin can refuse five times before any ban applies.</p>
+                        <span class="src">Prison.cs, EffectiveMinTimeFrame</span>
+                    </li>
+                    <li>
+                        <h3>Spent coins start clean today</h3>
+                        <p><code>Prison.InheritPunishment</code> still exists, but nothing calls it. Descendant banning landed in <a href="https://github.com/WalletWasabi/WalletWasabi/pull/11364">#11364</a> (Aug 2023) and was halved per spend in <a href="https://github.com/WalletWasabi/WalletWasabi/pull/11940">#11940</a>. The CoinJoinIdStore removal in <a href="https://github.com/WalletWasabi/WalletWasabi/pull/13228">#13228</a> (Jul 2024) dropped the <code>!</code> from its filter, so from then on only coinjoin outputs inherited bans. The IoC rewiring in <a href="https://github.com/WalletWasabi/WalletWasabi/pull/13076">#13076</a> (Dec 2024) then removed the call entirely.</p>
+                        <span class="src">git log -S "InheritPunishment(" &middot; 923ba7f25f, 3621111fdd, 59b908c0b8, 00288b29d2</span>
+                    </li>
+                    <li>
+                        <h3>One refusal buys one blame round, not one full round</h3>
+                        <p>After a failed signing, the coordinator starts a blame round for the coins that did sign. Honest clients follow blame rounds with no retry limit. The attacker's other coins in that round are whitelisted too, so the chain goes on. With default timeouts each blame round lasts at most 3 + 1 + 1 + 1 = 6 minutes. A chain ends when the attacker runs out of coins in it or the round drops below <code>MinInputCountByBlameRound</code>. A round holds at most <code>MaxInputCountByRound</code> inputs, so one round supports at most max &minus; min + 1 refusals.</p>
+                        <span class="src">Arena.cs, EndRoundAndTryCreateBlameRoundAsync &middot; CoinJoinClient.cs "Keep going to blame round until there's none"</span>
+                    </li>
+                    <li>
+                        <h3>Mass refusals get a flat, short ban</h3>
+                        <p>When more coins fail at once than the round's minimum input count, the coordinator treats it as its own fault. Each coin gets a stability ban of 20 minutes plus 0 to 3 hours, whatever its value. This calculator does not model that route.</p>
+                        <span class="src">Arena.cs, ReasonableOffendersCount &rarr; Prison.CoordinatorStabilitySafetyBan</span>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>What the Model Simplifies</h2>
+                <ul class="plain">
+                    <li>Refusals come at a steady pace: one every refusal cost &divide; rounds kept failing. Each coin sits in a round for one refusal cost before it refuses.</li>
+                    <li>All coins are the same size, and respending doesn't shrink them. A note appears when laundering one ban costs more than the coin is worth.</li>
+                    <li>&ldquo;Respend banned coins&rdquo; chains the respends in one block and waits for one confirmation. Batching many coins into one transaction brings the per-coin size down toward 100 vB.</li>
+                    <li>With half inheritance, a descendant's ban keeps the original start time, as #11940 did. The wait-out route is the same in every inheritance mode, because it never spends a banned coin.</li>
+                    <li>Cost of capital is capital &times; annual rate &times; attack length. It measures time value only, not the risk of holding the coins.</li>
+                </ul>
+            </section>
+
+            <div class="info-box">
+                <strong>Source:</strong> rules and defaults read from WalletWasabi master (Prison.cs, Arena.cs, WabiSabiConfig.cs) in September 2026. A coordinator can change every one of these settings in its config.
+            </div>
+        </main>
+    </div>
+
+</div>
+
+<footer>
+    <div class="footer-inner">
+        <span class="footer-text">Coinjoiner &mdash; Privacy for Bitcoin</span>
+        <div class="footer-links">
+            <a href="/status/">Status</a>
+            <a href="https://bitcointalk.org/index.php?topic=1159946.msg66150778#msg66150778">PGP</a>
+            <a href="https://github.com/Coinjoiner21" aria-label="GitHub">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            </a>
+            <a href="https://x.com/coinjoinercom" aria-label="X (Twitter)">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+        </div>
+    </div>
+</footer>
+
+<script>
+(function () {
+    "use strict";
+
+    // ---------- Model (mirrors Prison.GetBanTimePeriod) ----------
+    function Heap() {
+        var k = [], v = [];
+        function swap(a, b) { var tk = k[a]; k[a] = k[b]; k[b] = tk; var tv = v[a]; v[a] = v[b]; v[b] = tv; }
+        function up(i) { while (i > 0) { var p = (i - 1) >> 1; if (k[p] <= k[i]) break; swap(p, i); i = p; } }
+        function down(i) {
+            var n = k.length;
+            for (;;) {
+                var l = 2 * i + 1, r = l + 1, m = i;
+                if (l < n && k[l] < k[m]) m = l;
+                if (r < n && k[r] < k[m]) m = r;
+                if (m === i) break;
+                swap(m, i); i = m;
+            }
+        }
+        return {
+            size: function () { return k.length; },
+            peekKey: function () { return k[0]; },
+            push: function (key, val) { k.push(key); v.push(val); up(k.length - 1); },
+            pop: function () { var top = v[0]; var lk = k.pop(), lv = v.pop(); if (k.length) { k[0] = lk; v[0] = lv; down(0); } return top; }
+        };
+    }
+
+    // Ban in minutes for the n-th offense of one outpoint (n >= 1); 0 when under the minimum.
+    function banMinutes(p, coinSats, n) {
+        var base = p.banMode === "fixed" ? p.fixedHours : p.severity / (coinSats / 1e8) * p.factor;
+        var min = base * Math.pow(p.mult, n - 1) * 60;
+        return min < p.minPrison ? 0 : min;
+    }
+
+    // Respend a coin banned for B minutes until it can register again.
+    function launder(p, B, inherit) {
+        if (inherit === "none") return { hops: 1, rem: 0 };
+        if (inherit === "full") return { hops: 1, rem: B };
+        var b = B, hops = 0;
+        while (hops < 64) {
+            hops++;
+            b = b / 2;
+            if (b < p.minPrison) b = 0;
+            if (b <= p.confMin) break;
+        }
+        return { hops: hops, rem: b };
+    }
+
+    function blameCycle(p) { return p.tBlameReg + p.tConfirm + p.tOutput + p.tSign; }
+    function cycleMinutes(p) { return p.cycleMode === "round" ? p.roundMin : blameCycle(p); }
+
+    function plan(p) {
+        var cycle = cycleMinutes(p);
+        var gap = cycle / p.lanes;
+        return { cycle: cycle, gap: gap, total: Math.floor(p.days * 1440 / gap) };
+    }
+
+    // strategy: "wait" reuses coins after their ban; "respend" respends banned coins right away.
+    // cap: coins the attacker owns (Infinity finds how many are needed).
+    function simulate(p, coinSats, strategy, cap, inherit) {
+        var pl = plan(p), cycle = pl.cycle, gap = pl.gap, total = pl.total;
+        var n = [];
+        var jailed = Heap(), ready = Heap();
+        var created = 0, hops = 0, stallAt = -1;
+        for (var i = 0; i < total; i++) {
+            var t = cycle + i * gap;
+            var mustBeFreeBy = t - cycle;
+            while (jailed.size() && jailed.peekKey() <= mustBeFreeBy) {
+                var jid = jailed.pop();
+                ready.push(n[jid], jid);
+            }
+            if (!ready.size()) {
+                if (created >= cap) { stallAt = i; break; }
+                n[created] = 0;
+                ready.push(0, created);
+                created++;
+            }
+            var id = ready.pop();
+            n[id]++;
+            var B = banMinutes(p, coinSats, n[id]);
+            var freeAt;
+            if (strategy === "wait" || B <= p.confMin) {
+                freeAt = t + B;
+            } else {
+                var l = launder(p, B, inherit);
+                hops += l.hops;
+                freeAt = t + Math.max(p.confMin, l.rem);
+                n[id] = 0;
+            }
+            jailed.push(freeAt, id);
+        }
+        var done = stallAt < 0 ? total : stallAt;
+        var capitalSats = created * coinSats;
+        var setupFeeSats = created * p.coinLifeVb * p.feeRate;
+        var respendFeeSats = hops * p.respendVb * p.feeRate;
+        var capitalCostSats = capitalSats * (p.capitalRate / 100) * (p.days / 365);
+        return {
+            total: total, done: done, stalled: stallAt >= 0, coins: created, hops: hops,
+            nextFree: jailed.size() ? jailed.peekKey() : 0,
+            capitalSats: capitalSats, setupFeeSats: setupFeeSats, respendFeeSats: respendFeeSats,
+            feeSats: setupFeeSats + respendFeeSats,
+            capitalCostSats: capitalCostSats,
+            totalCostSats: setupFeeSats + respendFeeSats + capitalCostSats,
+            downtimeMin: done * gap
+        };
+    }
+
+    // ---------- Parameters ----------
+    var DEFAULTS = {
+        days: 7, lanes: 1, cycleMode: "blame",
+        tBlameReg: 3, tConfirm: 1, tOutput: 1, tSign: 1, roundMin: 30,
+        maxInputs: 100, minBlame: 40,
+        banMode: "formula", severity: 0.1, factor: 1, fixedHours: 24, mult: 1.3, minPrison: 20, inherit: "none",
+        coinSats: 10000, coinsOwned: 1000,
+        feeRate: 2, respendVb: 110, coinLifeVb: 100, confMin: 10, capitalRate: 5
+    };
+    var EXAMPLE = Object.assign({}, DEFAULTS, { cycleMode: "round", roundMin: 30, coinSats: 10000, coinsOwned: 1000, feeRate: 1, respendVb: 100 });
+    var NUM_IDS = ["days", "lanes", "tBlameReg", "tConfirm", "tOutput", "tSign", "roundMin", "maxInputs", "minBlame",
+        "severity", "factor", "fixedHours", "mult", "minPrison", "coinSats", "coinsOwned",
+        "feeRate", "respendVb", "coinLifeVb", "confMin", "capitalRate"];
+    var INT_IDS = { lanes: 1, coinsOwned: 1, maxInputs: 1, minBlame: 1 };
+    var STORE_KEY = "coinjoiner:refuse-signing-ddos:v1";
+    function $(id) { return document.getElementById(id); }
+    var params = Object.assign({}, DEFAULTS);
+
+    function loadStored() {
+        try {
+            var raw = localStorage.getItem(STORE_KEY);
+            if (!raw) return;
+            var obj = JSON.parse(raw);
+            Object.keys(DEFAULTS).forEach(function (k) {
+                if (k in obj && typeof obj[k] === typeof DEFAULTS[k]) params[k] = obj[k];
+            });
+        } catch (e) { /* storage unavailable */ }
+    }
+
+    function store() {
+        try { localStorage.setItem(STORE_KEY, JSON.stringify(params)); } catch (e) { /* storage unavailable */ }
+    }
+
+    function writeInputs() {
+        NUM_IDS.forEach(function (id) { $(id).value = params[id]; $(id).removeAttribute("aria-invalid"); });
+        $("cycle-blame").checked = params.cycleMode === "blame";
+        $("cycle-round").checked = params.cycleMode === "round";
+        $("ban-formula").checked = params.banMode === "formula";
+        $("ban-fixed").checked = params.banMode === "fixed";
+        $("inherit").value = params.inherit;
+        syncVisibility();
+    }
+
+    function readInputs() {
+        NUM_IDS.forEach(function (id) {
+            var input = $(id);
+            var v = parseFloat(input.value);
+            var min = parseFloat(input.min), max = parseFloat(input.max);
+            if (!isFinite(v) || v < min || v > max) { input.setAttribute("aria-invalid", "true"); return; }
+            input.removeAttribute("aria-invalid");
+            params[id] = INT_IDS[id] ? Math.round(v) : v;
+        });
+        params.cycleMode = $("cycle-round").checked ? "round" : "blame";
+        params.banMode = $("ban-fixed").checked ? "fixed" : "formula";
+        params.inherit = $("inherit").value;
+        syncVisibility();
+    }
+
+    function syncVisibility() {
+        $("blame-fields").hidden = params.cycleMode !== "blame";
+        $("round-fields").hidden = params.cycleMode !== "round";
+        $("formula-fields").hidden = params.banMode !== "formula";
+        $("fixed-fields").hidden = params.banMode !== "fixed";
+    }
+
+    // ---------- Formatting ----------
+    var nf0 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+    var nf1 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
+    function int(x) { return nf0.format(Math.round(x)); }
+    function sats(x) { return int(x) + " sats"; }
+    function btc(s) {
+        var b = s / 1e8;
+        if (b === 0) return "0 BTC";
+        if (b >= 100) return nf0.format(b) + " BTC";
+        if (b >= 1) return b.toFixed(2) + " BTC";
+        if (b >= 0.01) return b.toFixed(4) + " BTC";
+        if (b >= 0.0001) return b.toFixed(6) + " BTC";
+        return b.toFixed(8) + " BTC";
+    }
+    function coin(s) { return s >= 1e6 ? btc(s) : sats(s); }
+    function dur(min) {
+        if (!isFinite(min)) return "forever";
+        if (min < 1) return nf1.format(min * 60) + " s";
+        if (min < 90) return nf1.format(min) + " min";
+        var h = min / 60;
+        if (h < 48) return nf1.format(h) + " h";
+        var d = h / 24;
+        if (d < 730) return nf1.format(d) + " days";
+        return nf1.format(d / 365) + " years";
+    }
+    function shortSats(x) {
+        if (x >= 1e9) return nf1.format(x / 1e9) + "B";
+        if (x >= 1e6) return nf1.format(x / 1e6) + "M";
+        if (x >= 1e3) return nf1.format(x / 1e3) + "k";
+        return nf1.format(x);
+    }
+    function btcTick(b) { return b >= 1 ? nf0.format(b) : String(Number(b.toPrecision(1))); }
+    function strong(text) { var b = document.createElement("b"); b.textContent = text; return b; }
+    function svgEl(tag, attrs, text) {
+        var e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (var k in attrs) e.setAttribute(k, attrs[k]);
+        if (text != null) e.textContent = text;
+        return e;
+    }
+    function fill(node, parts) {
+        node.replaceChildren();
+        parts.forEach(function (x) { node.append(x); });
+    }
+    function setKv(dl, rows) {
+        dl.replaceChildren();
+        rows.forEach(function (r) {
+            var dt = document.createElement("dt");
+            var dd = document.createElement("dd");
+            dt.textContent = r[0];
+            dd.textContent = r[1];
+            if (r[2]) { var s = document.createElement("small"); s.textContent = r[2]; dd.appendChild(s); }
+            if (r[3]) { dt.className = "total"; dd.className = "total"; }
+            dl.append(dt, dd);
+        });
+    }
+    function cell(text, cls, subText) {
+        var td = document.createElement("td");
+        if (cls) td.className = cls;
+        td.textContent = text;
+        if (subText) { var s = document.createElement("span"); s.className = "sub-t"; s.textContent = subText; td.appendChild(s); }
+        return td;
+    }
+
+    // ---------- Render ----------
+    var MAX_REFUSALS = 3000000;
+    var CHART_MAX_REFUSALS = 250000;
+
+    function render() {
+        var p = params;
+        var pl = plan(p), gap = pl.gap, total = pl.total;
+        var chainMax = Math.max(1, p.maxInputs - p.minBlame + 1);
+        fill($("cycle-derived"), [
+            "One blame round lasts at most ", strong(dur(blameCycle(p))), ". One round can carry at most ",
+            strong(int(chainMax) + " refusals"), " (", strong(dur(chainMax * blameCycle(p))), ")."
+        ]);
+
+        if (total < 1) {
+            $("headline").textContent = "The attack is shorter than one refusal. Lengthen it or add rounds.";
+            return;
+        }
+        if (total > MAX_REFUSALS) {
+            $("headline").textContent = "That is " + int(total) + " refusals, too many to simulate here. Shorten the attack or lower the rounds kept failing.";
+            return;
+        }
+
+        fill($("headline"), [
+            "Keeping ", p.lanes === 1 ? "1 round" : int(p.lanes) + " rounds", " failing for ", dur(p.days * 1440),
+            " takes ", int(total) + " refusals", ", one every ", dur(gap), "."
+        ]);
+
+        // Ban summary
+        var b1 = banMinutes(p, p.coinSats, 1);
+        var banline = $("banline");
+        banline.replaceChildren();
+        var l1 = document.createElement("div");
+        if (b1 > 0) {
+            fill(l1, ["A ", strong(coin(p.coinSats)), " coin is banned for ", strong(dur(b1)), " after its first refusal, ",
+                strong(dur(banMinutes(p, p.coinSats, 2))), " after its second."]);
+        } else {
+            fill(l1, ["A ", strong(coin(p.coinSats)), " coin is ", strong("not banned"), " on its first refusal: the ban would be under the ",
+                dur(p.minPrison), " minimum."]);
+            var k = 1;
+            while (k < 200 && banMinutes(p, p.coinSats, k) === 0) k++;
+            if (k < 200) l1.append(" It can refuse " + (k - 1) + " times before a ban applies.");
+        }
+        banline.appendChild(l1);
+        var l2 = document.createElement("div");
+        l2.className = "formula";
+        if (p.banMode === "formula") {
+            var freeAbove = p.severity * p.factor / (p.minPrison / 60) * 1e8;
+            l2.textContent = p.severity + " BTC·h ÷ " + (p.coinSats / 1e8).toPrecision(3) + " BTC × " + p.factor + " = " +
+                nf1.format(p.severity / (p.coinSats / 1e8) * p.factor) + " h" +
+                (p.minPrison > 0 ? " · coins above " + btc(freeAbove) + " get no ban on a first refusal" : "");
+        } else {
+            l2.textContent = "Fixed " + p.fixedHours + " h × " + p.mult + "^(offenses − 1), whatever the coin size";
+        }
+        banline.appendChild(l2);
+        var l3 = document.createElement("div");
+        l3.className = "formula";
+        l3.textContent = p.cycleMode === "blame"
+            ? int(total) + " refusals ÷ " + chainMax + " per round = coins needed in at least " + int(Math.ceil(total / chainMax)) + " separate rounds"
+            : "Counting " + dur(p.roundMin) + " per refusal. After the first refusal in a round, the coordinator only reruns a blame round (≈ " + dur(blameCycle(p)) + ").";
+        banline.appendChild(l3);
+
+        // Strategies
+        var wait = simulate(p, p.coinSats, "wait", Infinity, p.inherit);
+        var resp = simulate(p, p.coinSats, "respend", Infinity, p.inherit);
+        function perDay(x) { return sats(x / p.days) + " per day"; }
+        var uses = wait.done / Math.max(1, wait.coins);
+        setKv($("kv-wait"), [
+            ["Coins needed", int(wait.coins), uses < 1.05 ? "each used once" : "each used " + nf1.format(uses) + " times on average"],
+            ["Capital tied up", btc(wait.capitalSats)],
+            ["Mining fees", sats(wait.feeSats), "creating and sweeping coins"],
+            ["Cost of capital", sats(wait.capitalCostSats)],
+            ["Total", sats(wait.totalCostSats), perDay(wait.totalCostSats), true]
+        ]);
+        var lb = b1 > p.confMin ? launder(p, b1, p.inherit) : { hops: 0, rem: 0 };
+        setKv($("kv-respend"), [
+            ["Coins needed", int(resp.coins), lb.hops ? lb.hops + " respend" + (lb.hops === 1 ? "" : "s") + " per first ban" : "bans too short to need respending"],
+            ["Capital tied up", btc(resp.capitalSats)],
+            ["Mining fees", sats(resp.feeSats), sats(resp.respendFeeSats) + " of it respending"],
+            ["Cost of capital", sats(resp.capitalCostSats)],
+            ["Total", sats(resp.totalCostSats), perDay(resp.totalCostSats), true]
+        ]);
+        var waitBest = wait.totalCostSats <= resp.totalCostSats;
+        $("chip-wait").hidden = !waitBest;
+        $("chip-respend").hidden = waitBest;
+        $("card-wait").classList.toggle("best", waitBest);
+        $("card-respend").classList.toggle("best", !waitBest);
+
+        var fw = $("flag-wait");
+        fw.hidden = !(wait.coins >= wait.done && wait.done > 1);
+        fw.textContent = "Every ban outlasts the attack, so each coin is used once. Ban length and inheritance make no difference to this route.";
+        var fr = $("flag-respend");
+        var perBanFee = lb.hops * p.respendVb * p.feeRate;
+        fr.hidden = true;
+        if (p.inherit === "full" && b1 > p.confMin) {
+            fr.hidden = false;
+            fr.textContent = "Respending doesn't shorten the ban here. It only resets the repeat multiplier.";
+        } else if (perBanFee >= p.coinSats) {
+            fr.hidden = false;
+            fr.textContent = "Laundering one ban costs " + sats(perBanFee) + ", more than the " + coin(p.coinSats) + " coin itself.";
+        }
+
+        // Owned coins
+        var ow = simulate(p, p.coinSats, "wait", p.coinsOwned, p.inherit);
+        var or = simulate(p, p.coinSats, "respend", p.coinsOwned, p.inherit);
+        if (ow.stalled) {
+            fill($("owned-wait"), ["Waiting out the bans, ", strong(int(p.coinsOwned) + " coins"), " cover ", strong(dur(ow.downtimeMin)),
+                " (" + int(ow.done) + " refusals). Then every coin is banned, and the first is free again at " + dur(ow.nextFree) + " into the attack."]);
+        } else {
+            fill($("owned-wait"), [strong(int(p.coinsOwned) + " coins"), " are enough to wait out every ban for the whole attack, with no respending. That ties up ",
+                strong(btc(p.coinsOwned * p.coinSats)), "."]);
+        }
+        if (or.stalled) {
+            fill($("owned-respend"), ["Respending banned coins, they cover ", strong(dur(or.downtimeMin)), " (" + int(or.done) + " refusals) before running out."]);
+        } else {
+            fill($("owned-respend"), ["Respending banned coins, the attacker needs only ", strong(int(or.coins)), " of them and pays ",
+                strong(sats(or.respendFeeSats)), " in respend fees."]);
+        }
+
+        // Inheritance table
+        var body = $("inherit-body");
+        body.replaceChildren();
+        var modes = [
+            ["none", "Start clean", "master today"],
+            ["half", "Inherit half per spend", "issue #15091, as in #11940"],
+            ["full", "Inherit the full ban", ""]
+        ];
+        var cheapest = [];
+        modes.forEach(function (m) {
+            var mode = m[0];
+            var r = mode === p.inherit ? resp : simulate(p, p.coinSats, "respend", Infinity, mode);
+            var hopsN = b1 > p.confMin ? launder(p, b1, mode).hops : 0;
+            var best = Math.min(r.totalCostSats, wait.totalCostSats);
+            cheapest.push(best);
+            var tr = document.createElement("tr");
+            if (mode === p.inherit) tr.className = "current";
+            tr.append(
+                cell(m[1], "", m[2]),
+                cell(hopsN ? int(hopsN) : "none", "n"),
+                cell(sats(r.totalCostSats), "n", int(r.coins) + " coins · " + btc(r.capitalSats)),
+                cell(sats(wait.totalCostSats), "n", int(wait.coins) + " coins · " + btc(wait.capitalSats)),
+                cell(sats(best), "n", r.totalCostSats < wait.totalCostSats ? "respend" : "wait out")
+            );
+            body.appendChild(tr);
+        });
+        var ratio = cheapest[1] / cheapest[0];
+        $("inherit-note").textContent = ratio < 1.05
+            ? "For a " + coin(p.coinSats) + " coin, half inheritance leaves the cheapest attack where it is (×" + ratio.toFixed(2) + "). The attacker switches routes instead of paying more."
+            : "For a " + coin(p.coinSats) + " coin, half inheritance raises the cheapest attack ×" + ratio.toFixed(2) + ".";
+
+        renderCharts(p, total);
+    }
+
+    // ---------- Charts ----------
+    var chartData = null;
+    var panels = {};
+    var SERIES = [
+        { name: "Wait out", color: "#1a1a1a" },
+        { name: "Respend", color: "#c1121f" }
+    ];
+
+    function renderCharts(p, total) {
+        var paused = $("chart-paused");
+        var charts = $("charts");
+        if (total > CHART_MAX_REFUSALS) {
+            charts.hidden = true;
+            paused.hidden = false;
+            paused.textContent = "The chart reruns the attack for 28 coin sizes, which is too slow above " + int(CHART_MAX_REFUSALS) +
+                " refusals. This attack has " + int(total) + ". The figures above are still exact.";
+            $("chart-table").replaceChildren();
+            chartData = null;
+            return;
+        }
+        charts.hidden = false;
+        paused.hidden = true;
+        var xs = [];
+        var lo = Math.log10(5000), hi = Math.log10(1e9), N = 28;
+        for (var i = 0; i < N; i++) xs.push(Math.round(Math.pow(10, lo + (hi - lo) * i / (N - 1))));
+        var rows = xs.map(function (x) {
+            var w = simulate(p, x, "wait", Infinity, p.inherit);
+            var r = simulate(p, x, "respend", Infinity, p.inherit);
+            return { x: x, wCap: w.capitalSats / 1e8, wFee: w.feeSats, rCap: r.capitalSats / 1e8, rFee: r.feeSats };
+        });
+        chartData = { rows: rows, current: p.coinSats };
+        drawPanel("capital", rows.map(function (r) { return [r.wCap, r.rCap]; }), btcTick, function (v) { return btc(v * 1e8); });
+        drawPanel("fees", rows.map(function (r) { return [r.wFee, r.rFee]; }), shortSats, sats);
+
+        var tb = $("chart-table");
+        tb.replaceChildren();
+        rows.forEach(function (r) {
+            var tr = document.createElement("tr");
+            [coin(r.x), btc(r.wCap * 1e8), sats(r.wFee), btc(r.rCap * 1e8), sats(r.rFee)].forEach(function (v) { tr.appendChild(cell(v, "n")); });
+            tb.appendChild(tr);
+        });
+    }
+
+    function drawPanel(name, values, tickFmt, tipFmt) {
+        var svg = $("svg-" + name);
+        var panel = $("panel-" + name);
+        var W = Math.max(260, svg.clientWidth || panel.clientWidth - 28);
+        var H = 240;
+        var m = { l: 52, r: 70, t: 12, b: 40 };
+        svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+        svg.replaceChildren();
+        var rows = chartData.rows;
+        var xmin = Math.log10(rows[0].x), xmax = Math.log10(rows[rows.length - 1].x);
+        var pos = [];
+        values.forEach(function (pair) { pair.forEach(function (v) { if (v > 0) pos.push(v); }); });
+        var ylo = Math.floor(Math.log10(Math.min.apply(null, pos)));
+        var yhi = Math.ceil(Math.log10(Math.max.apply(null, pos)));
+        if (yhi === ylo) yhi = ylo + 1;
+        function X(x) { return m.l + (Math.log10(x) - xmin) / (xmax - xmin) * (W - m.l - m.r); }
+        function Y(v) { return m.t + (1 - (Math.log10(v) - ylo) / (yhi - ylo)) * (H - m.t - m.b); }
+        var grid = "#e5e0d2", axis = "#8a8a8a", muted = "#555";
+        var font = "'Helvetica Neue', Arial, sans-serif";
+
+        var span = yhi - ylo;
+        var step = span > 6 ? Math.ceil(span / 5) : 1;
+        for (var e = ylo; e <= yhi; e += step) {
+            var y = Y(Math.pow(10, e));
+            svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: y, y2: y, stroke: grid, "stroke-width": 1 }));
+            svg.appendChild(svgEl("text", { x: m.l - 7, y: y + 4, "text-anchor": "end", "font-size": 11, "font-family": font, fill: muted }, tickFmt(Math.pow(10, e))));
+        }
+        svg.appendChild(svgEl("line", { x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b, stroke: "#1a1a1a", "stroke-width": 1 }));
+        [1e4, 1e5, 1e6, 1e7, 1e8, 1e9].forEach(function (t) {
+            var x = X(t);
+            svg.appendChild(svgEl("line", { x1: x, x2: x, y1: H - m.b, y2: H - m.b + 4, stroke: "#1a1a1a", "stroke-width": 1 }));
+            svg.appendChild(svgEl("text", { x: x, y: H - m.b + 17, "text-anchor": "middle", "font-size": 11, "font-family": font, fill: muted }, shortSats(t)));
+        });
+        svg.appendChild(svgEl("text", { x: (m.l + W - m.r) / 2, y: H - 4, "text-anchor": "middle", "font-size": 11, "font-family": font, fill: muted, "font-style": "italic" }, "coin size, sats (1M = 0.01 BTC)"));
+
+        var cur = chartData.current;
+        if (cur >= rows[0].x && cur <= rows[rows.length - 1].x) {
+            var cx = X(cur);
+            var nearRight = cx > W - m.r - 70;
+            svg.appendChild(svgEl("line", { x1: cx, x2: cx, y1: m.t, y2: H - m.b, stroke: axis, "stroke-width": 1 }));
+            svg.appendChild(svgEl("text", { x: nearRight ? cx - 5 : cx + 5, y: m.t + 10, "font-size": 10.5, "font-family": font, fill: muted, "text-anchor": nearRight ? "end" : "start", "letter-spacing": "0.8" }, "YOUR COIN"));
+        }
+
+        var ends = [];
+        for (var s = 0; s < 2; s++) {
+            var d = "", pen = false, last = null;
+            for (var i = 0; i < rows.length; i++) {
+                var v = values[i][s];
+                if (!(v > 0)) { pen = false; continue; }
+                d += (pen ? "L" : "M") + X(rows[i].x).toFixed(1) + " " + Y(v).toFixed(1);
+                pen = true;
+                last = { x: X(rows[i].x), y: Y(v) };
+            }
+            svg.appendChild(svgEl("path", { d: d, fill: "none", stroke: SERIES[s].color, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+            ends.push(last);
+        }
+        // Direct end labels, nudged apart when the lines end close together.
+        if (ends[0] && ends[1]) {
+            var ly = [ends[0].y + 4, ends[1].y + 4];
+            if (Math.abs(ly[0] - ly[1]) < 14) {
+                var upper = ly[0] <= ly[1] ? 0 : 1;
+                var mid = (ly[0] + ly[1]) / 2;
+                ly[upper] = mid - 7;
+                ly[1 - upper] = mid + 7;
+            }
+            for (var s2 = 0; s2 < 2; s2++) {
+                svg.appendChild(svgEl("text", { x: ends[s2].x + 8, y: ly[s2], "font-size": 11, "font-family": font, fill: "#1a1a1a", "font-weight": 700 }, SERIES[s2].name));
+            }
+        }
+
+        var hover = svgEl("g", { opacity: 0 });
+        var vline = svgEl("line", { y1: m.t, y2: H - m.b, stroke: axis, "stroke-width": 1 });
+        hover.appendChild(vline);
+        var dots = SERIES.map(function (sr) { var c = svgEl("circle", { r: 4, fill: sr.color, stroke: "#fdfdfd", "stroke-width": 2 }); hover.appendChild(c); return c; });
+        svg.appendChild(hover);
+        svg.appendChild(svgEl("rect", { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: "transparent" }));
+
+        panels[name] = { svg: svg, panel: panel, X: X, Y: Y, values: values, rows: rows, hover: hover, vline: vline, dots: dots, tipFmt: tipFmt, W: W, idx: panels[name] ? panels[name].idx : -1 };
+        if (!svg.dataset.bound) {
+            svg.dataset.bound = "1";
+            svg.addEventListener("pointermove", function (ev) {
+                var P = panels[name];
+                var rect = P.svg.getBoundingClientRect();
+                var px = (ev.clientX - rect.left) * (P.W / rect.width);
+                var best = 0, bd = Infinity;
+                P.rows.forEach(function (r, i) { var dd = Math.abs(P.X(r.x) - px); if (dd < bd) { bd = dd; best = i; } });
+                showTip(name, best);
+            });
+            svg.addEventListener("pointerleave", function () { hideTip(name); });
+            svg.addEventListener("blur", function () { hideTip(name); });
+            svg.addEventListener("focus", function () {
+                var P = panels[name];
+                showTip(name, P.idx >= 0 ? P.idx : Math.floor(P.rows.length / 2));
+            });
+            svg.addEventListener("keydown", function (ev) {
+                if (ev.key !== "ArrowLeft" && ev.key !== "ArrowRight") return;
+                ev.preventDefault();
+                var P = panels[name];
+                var i = Math.max(0, Math.min(P.rows.length - 1, (P.idx < 0 ? 0 : P.idx) + (ev.key === "ArrowRight" ? 1 : -1)));
+                showTip(name, i);
+            });
+        }
+    }
+
+    function showTip(name, i) {
+        var P = panels[name];
+        if (!P) return;
+        P.idx = i;
+        var r = P.rows[i];
+        var x = P.X(r.x);
+        P.vline.setAttribute("x1", x);
+        P.vline.setAttribute("x2", x);
+        P.values[i].forEach(function (v, s) {
+            if (v > 0) { P.dots[s].setAttribute("cx", x); P.dots[s].setAttribute("cy", P.Y(v)); P.dots[s].setAttribute("opacity", 1); }
+            else P.dots[s].setAttribute("opacity", 0);
+        });
+        P.hover.setAttribute("opacity", 1);
+        var tip = P.panel.querySelector(".tip");
+        tip.replaceChildren();
+        var hdr = document.createElement("div");
+        hdr.className = "t-h";
+        hdr.textContent = coin(r.x) + " coins";
+        tip.appendChild(hdr);
+        P.values[i].forEach(function (v, s) {
+            var row = document.createElement("div");
+            row.className = "t-r";
+            var lab = document.createElement("span");
+            var key = document.createElement("span");
+            key.className = "key " + (s === 0 ? "s1" : "s2");
+            key.style.width = "12px";
+            lab.append(key, SERIES[s].name);
+            var val = document.createElement("b");
+            val.textContent = P.tipFmt(v);
+            row.append(lab, val);
+            tip.appendChild(row);
+        });
+        tip.hidden = false;
+        var rect = P.svg.getBoundingClientRect();
+        var scale = rect.width / P.W;
+        var panelRect = P.panel.getBoundingClientRect();
+        var left = rect.left - panelRect.left + x * scale + 12;
+        var tw = tip.offsetWidth;
+        if (left + tw > panelRect.width - 6) left = rect.left - panelRect.left + x * scale - tw - 12;
+        tip.style.left = Math.max(6, left) + "px";
+        tip.style.top = (rect.top - panelRect.top + 14) + "px";
+    }
+
+    function hideTip(name) {
+        var P = panels[name];
+        if (!P) return;
+        P.hover.setAttribute("opacity", 0);
+        P.panel.querySelector(".tip").hidden = true;
+    }
+
+    // ---------- Wiring ----------
+    var timer = 0;
+    function schedule() {
+        clearTimeout(timer);
+        timer = setTimeout(function () { readInputs(); store(); render(); }, 140);
+    }
+    document.querySelectorAll("aside.controls input, aside.controls select").forEach(function (c) {
+        c.addEventListener("input", schedule);
+        c.addEventListener("change", schedule);
+    });
+    $("preset-defaults").addEventListener("click", function () { params = Object.assign({}, DEFAULTS); writeInputs(); store(); render(); });
+    $("preset-example").addEventListener("click", function () { params = Object.assign({}, EXAMPLE); writeInputs(); store(); render(); });
+
+    var lastWidth = 0;
+    if (window.ResizeObserver) {
+        new ResizeObserver(function () {
+            var w = $("charts").clientWidth;
+            if (Math.abs(w - lastWidth) > 4 && chartData) { lastWidth = w; renderCharts(params, plan(params).total); }
+        }).observe($("charts"));
+    }
+
+    loadStored();
+    writeInputs();
+    render();
+})();
+</script>
+
+</body>
+</html>
