@@ -99,7 +99,7 @@ After redeploying, from any machine:
 
 ```sh
 curl -is -H "Origin: https://coinjoiner.com" \
-  https://api.coinjoiner.com/wabisabi/coinjoin-history | head -n 20
+  https://coinjoiner.com/wabisabi/coinjoin-history | head -n 20
 ```
 
 Expect:

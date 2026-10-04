@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coinjoiner - WabiSabi Coordinator</title>
-    <meta name="description" content="Coinjoiner is a 0% fee WabiSabi coordinator for Wasabi Wallet, improving Bitcoin privacy through decentralized coinjoins.">
-    <meta property="og:title" content="Coinjoiner - WabiSabi Coordinator">
-    <meta property="og:description" content="0% fee WabiSabi coordinator improving Bitcoin privacy.">
+    <title>Coinjoiner - Wasabi Wallet Coordinator</title>
+    <meta name="description" content="Coinjoiner is a 0% fee Wasabi Wallet coordinator, improving Bitcoin privacy through decentralized coinjoins.">
+    <meta property="og:title" content="Coinjoiner - Wasabi Wallet Coordinator">
+    <meta property="og:description" content="0% fee Wasabi Wallet coordinator improving Bitcoin privacy.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://coinjoiner.com">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -377,37 +377,6 @@
             padding-top: 8px;
         }
 
-        /* Goals list */
-        .goals-list {
-            list-style: none;
-            padding: 0;
-            margin-top: 16px;
-            counter-reset: goal;
-        }
-
-        .goals-list li {
-            padding: 18px 0 18px 56px;
-            border-top: 1px solid var(--ink);
-            position: relative;
-            counter-increment: goal;
-        }
-
-        .goals-list li::before {
-            content: counter(goal, decimal-leading-zero);
-            position: absolute;
-            left: 0;
-            top: 16px;
-            color: var(--red);
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            font-weight: 700;
-            font-size: 1.4em;
-            letter-spacing: -0.5px;
-        }
-
-        .goals-list li:last-child {
-            border-bottom: 1px solid var(--ink);
-        }
-
         /* PR list */
         .pr-list {
             list-style: none;
@@ -566,7 +535,7 @@
 <!-- Hero -->
 <div class="hero">
     <div style="max-width: 960px; margin: 0 auto;">
-        <span class="kicker">WabiSabi Coordinator &middot; 0% Fee</span>
+        <span class="kicker">Wasabi Wallet Coordinator &middot; 0% Fee</span>
         <h1>Coinjoiner<span class="dot">.</span></h1>
         <p class="subtitle">Driving Bitcoin privacy towards resilience and decentralization.</p>
         <a href="#connect" class="hero-cta">Get Connected &rarr;</a>
@@ -583,7 +552,7 @@
             <label>Auto-detect string</label>
             <p>Copy this string and open Wasabi Wallet - it will detect the coordinator automatically.</p>
             <div class="copy-field">
-                <code id="auto-string">name=Coinjoiner&network=main&coordinatorUri=https://api.coinjoiner.com/&readMore=https://coinjoiner.com/&absoluteMinInputCount=21</code>
+                <code id="auto-string">name=Coinjoiner&network=main&coordinatorUri=https://coinjoiner.com/&readMore=https://coinjoiner.com/&absoluteMinInputCount=21</code>
                 <button class="copy-btn" onclick="copyText('auto-string', this)">Copy</button>
             </div>
         </div>
@@ -592,7 +561,7 @@
             <label>Manual setup</label>
             <p>Or paste the Coordinator URI directly into your Coordinator Settings.</p>
             <div class="copy-field">
-                <code id="manual-uri">https://api.coinjoiner.com/</code>
+                <code id="manual-uri">https://coinjoiner.com/</code>
                 <button class="copy-btn" onclick="copyText('manual-uri', this)">Copy</button>
             </div>
         </div>
@@ -615,6 +584,110 @@
     <p>Talk is cheap. Below are the patches we have authored and merged into <a href="https://github.com/WalletWasabi/WalletWasabi">Wasabi Wallet</a>:</p>
 
     <ul class="pr-list">
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/15105" class="pr-title">Fix: newly created wallet stays on the loading screen until the next block</a>
+            <span class="pr-meta">#15105 &middot; merged 2026-10-01</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/15057" class="pr-title">Don't show "Some funds are rejected" when no coin was banned</a>
+            <span class="pr-meta">#15057 &middot; merged 2026-09-30</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/15077" class="pr-title">Fix missing selection checkbox in Manual Control</a>
+            <span class="pr-meta">#15077 &middot; merged 2026-09-24</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/15076" class="pr-title">Fix the frozen exchange rate, priority fee and Bitcoin node</a>
+            <span class="pr-meta">#15076 &middot; merged 2026-09-22</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/15065" class="pr-title">Split TransactionModel into one model per kind of history row</a>
+            <span class="pr-meta">#15065 &middot; merged 2026-09-21</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14801" class="pr-title">Break down coinjoin fees into mining fee, wasted dust and payments</a>
+            <span class="pr-meta">#14801 &middot; merged 2026-09-18</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14983" class="pr-title">[Coinjoin] Only use private funds for coinjoin payments toggle</a>
+            <span class="pr-meta">#14983 &middot; merged 2026-09-17</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/15051" class="pr-title">[Privacy] Warn user for clearnet link</a>
+            <span class="pr-meta">#15051 &middot; merged 2026-09-17</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/15040" class="pr-title">Fix coinjoin stalling when the only non-private coins are banned</a>
+            <span class="pr-meta">#15040 &middot; merged 2026-09-10</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/15031" class="pr-title">Mark payments as signed before posting the witnesses</a>
+            <span class="pr-meta">#15031 &middot; merged 2026-09-09</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14881" class="pr-title">[Coordinator] Shave anchor output into the next lowest denomination</a>
+            <span class="pr-meta">#14881 &middot; merged 2026-09-03</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14963" class="pr-title">Hide privacy progress % and bar with discreet mode</a>
+            <span class="pr-meta">#14963 &middot; merged 2026-08-23</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14820" class="pr-title">Prioritize the recovered wallet over the previously existing wallet</a>
+            <span class="pr-meta">#14820 &middot; merged 2026-08-18</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14822" class="pr-title">Show awaiting addresses of all script types</a>
+            <span class="pr-meta">#14822 &middot; merged 2026-07-29</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14871" class="pr-title">Bright white in card titles</a>
+            <span class="pr-meta">#14871 &middot; merged 2026-07-29</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14789" class="pr-title">Pay in coinjoin regardless of anonymity score</a>
+            <span class="pr-meta">#14789 &middot; merged 2026-07-28</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14811" class="pr-title">Route coinjoin payment add/cancel through the Wallet backend</a>
+            <span class="pr-meta">#14811 &middot; merged 2026-07-23</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14821" class="pr-title">Arrow key movements active without clicking</a>
+            <span class="pr-meta">#14821 &middot; merged 2026-07-23</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14826" class="pr-title">Fix icon and merge rows on sync cards</a>
+            <span class="pr-meta">#14826 &middot; merged 2026-07-23</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14808" class="pr-title">Use Taproot receive addresses by default</a>
+            <span class="pr-meta">#14808 &middot; merged 2026-07-21</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14807" class="pr-title">TreeDataGrid: Work around missing row-action cells on Linux</a>
+            <span class="pr-meta">#14807 &middot; merged 2026-07-21</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14783" class="pr-title">Fix GUI staying frozen after Ctrl-C when shutdown is prevented</a>
+            <span class="pr-meta">#14783 &middot; merged 2026-07-14</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14779" class="pr-title">Measure the sync progress in the wallet's own block range</a>
+            <span class="pr-meta">#14779 &middot; merged 2026-07-14</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14773" class="pr-title">Fix regtest from persisting block header chain</a>
+            <span class="pr-meta">#14773 &middot; merged 2026-07-11</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14730" class="pr-title">Fix coins wrongly showing anonymity score 2147483647</a>
+            <span class="pr-meta">#14730 &middot; merged 2026-07-07</span>
+        </li>
+        <li>
+            <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14727" class="pr-title">Fix unresponsive "Done" button when opened from the Bitcoin RPC error</a>
+            <span class="pr-meta">#14727 &middot; merged 2026-07-01</span>
+        </li>
         <li>
             <a href="https://github.com/WalletWasabi/WalletWasabi/pull/14442" class="pr-title">Fix startup crash when RPC credentials are not configured in test networks</a>
             <span class="pr-meta">#14442 &middot; merged 2026-03-31</span>
@@ -647,20 +720,6 @@
         <p id="ref1">[1] <a href="https://bitcointalk.org/index.php?topic=5405325.0">bitcointalk.org/index.php?topic=5405325.0</a></p>
         <p id="ref2">[2] <a href="https://github.com/GingerPrivacy/GingerWallet/discussions/116">github.com/GingerPrivacy/GingerWallet/discussions/116</a></p>
     </div>
-</div>
-
-<!-- Goals -->
-<div class="section" id="goals">
-    <h2>Where We Want to Take Bitcoin Privacy</h2>
-    <p>We see significant room for improvement:</p>
-
-    <ul class="goals-list">
-        <li><strong>Mitigate coordinator partitioning attacks</strong> &mdash; addressing vectors like blinding keys and round IDs so WabiSabi can become truly trustless.</li>
-        <li><strong>Improve the user experience</strong> &mdash; pay-to-many support, discovering coordinators via Nostr without relying on any single third party.</li>
-        <li><strong>Build a light client</strong> &mdash; resistant to supply-chain attacks, making privacy accessible without trusting a full software distribution.</li>
-    </ul>
-
-    <p style="margin-top: 28px;">Bitcoin deserves robust privacy solutions that no single entity can shut down. Coinjoiner is our contribution to that future.</p>
 </div>
 
 <!-- Closing quote -->
